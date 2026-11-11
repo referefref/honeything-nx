@@ -8,6 +8,8 @@ ht = HTLogging()
 class DigestAuthMixin(object):
 
     def apply_checksum(self, data):
+        if not isinstance(data, bytes):
+            data = data.encode('utf-8')
         return md5(data).hexdigest()
 
     def apply_digest(self, secret, data):
@@ -85,7 +87,7 @@ class DigestAuthMixin(object):
             self.params = []
 
     def _create_nonce(self):
-        return md5("%d:%s" % (time.time(), self.realm)).hexdigest()
+        return md5(("%d:%s" % (time.time(), self.realm)).encode('utf-8')).hexdigest()
 
     def createAuthHeader(self):
         self.set_status(401)

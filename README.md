@@ -1,3 +1,21 @@
+# HoneyThing (Python 3)
+
+Adapted from https://github.com/omererdem/honeything by Ömer Erdem (idea by Ali Ikinci, Honeynet GSoC 2015). The original runs only on Python 2.7; this copy is a Python 3 migration of its last commit (fe47ba9, March 2016) that keeps the honeypot's behaviour unchanged. Licence: GNU GPL v3 (see LICENSE); the embedded catawampus TR-069 code is Google's, under the Apache License 2.0 (src/cwmp/LICENSE).
+
+## Changes for Python 3
+
+- Converted with 2to3, then fixed by hand where 2to3 is not enough: relative imports in catawampus, bytes and text in the HTTP server, tornado's curl client, the Digest authentication helper (curtain), xmlwitch, the CWMP logger and the SOAP handler, the `iteritems` family on catawampus's own dictionary classes, and a `str`/`float` comparison in the download scheduler that Python 2 allowed.
+- `src/cwmp/platform` is renamed `src/cwmp/cpe_platform`, because on Python 3 it hid the standard library's `platform` module (needed by `uuid`).
+- `cgi` (removed in Python 3.13) is no longer used: form parsing uses `urllib.parse` and `email`.
+- Responses stay byte-for-byte as under Python 2.7: the web server keeps Python 2's error page and header order (`send_error`), and HTTP headers on port 7547 and XML namespace attributes are emitted in Python 2.7 dict order (`src/cwmp/tr/vendor/py2order.py`). The CWMP process still names itself `cwmpd`.
+- HoneyThing starts `cwmpd` with its own interpreter (`sys.executable`).
+- Optional: the environment variable `HONEYTHING_CONFIG` sets the path of `config.ini` (default `/opt/honeything/config/config.ini`, as before).
+- Tested with Python 3.11 and pycurl 7.49.0 on Debian 12, against the original running on Python 2.7.18: identical responses on ports 80 and 7547 and identical log formats (only the order of POST fields in `http.log` differs).
+
+To run from a checkout: copy `src/config/config.ini` to `/opt/honeything/config/` (or set `HONEYTHING_CONFIG`), create the log, download, spool and run directories it names, `pip install pycurl`, then `PYTHONPATH=<checkout> python3 <checkout>/src/HoneyThing.py`. Set `acs_url` in `config.ini` to an ACS you control: the default, `http://IP:8080/libreacs/acs`, is a placeholder.
+
+---
+
 # HoneyThing
 HoneyThing is a honeypot for Internet of TR-069 things. It's designed to act as completely a modem/router that has RomPager embedded web server and supports [TR-069 (CWMP)](https://www.broadband-forum.org/technical/download/TR-069_Amendment-5.pdf) protocol.
 

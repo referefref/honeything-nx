@@ -17,6 +17,7 @@
 
 
 import os
+import sys
 import shlex
 import subprocess
 import http.server
@@ -75,7 +76,8 @@ class HoneyThing:
         socket_file = self.cfg.getConfig("cwmp", "socket_file")
         request_path = self.cfg.getConfig("cwmp", "request_path")
 
-        cpe = os.path.dirname(os.path.abspath(__file__)) + \
+        # Python 3 port: run cwmpd with the same interpreter as HoneyThing
+        cpe = sys.executable + ' ' + os.path.dirname(os.path.abspath(__file__)) + \
               '/cwmp/cwmpd --platform=fakecpe --rcmd-port=0 --cpe-listener ' \
               '-l=%s --port=%s --acs-url=%s --unix-path=%s --ping-path=%s &' \
               % (cwmp_listen_address, cwmp_port, acs_url, socket_file, request_path)

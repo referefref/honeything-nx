@@ -22,7 +22,8 @@ import configparser
 class ConfigReader:
 
     def __init__(self):
-        self.configFile = "/opt/honeything/config/config.ini"
+        # HONEYTHING_CONFIG (Python 3 port) overrides the default path
+        self.configFile = os.environ.get("HONEYTHING_CONFIG", "/opt/honeything/config/config.ini")
 
 
     '''
@@ -45,7 +46,7 @@ class ConfigReader:
             try:
                 value = config.get(section, option)
             except (configparser.NoSectionError, configparser.NoOptionError) as msg:
-                print('No section or option. Error code: ' + str(msg[0]) + ' , Error message : ' + msg[1])
+                print('No section or option. Error message : ' + str(msg))
         else:
             print('Invalid path for configuration file')
         return value

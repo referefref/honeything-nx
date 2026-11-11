@@ -180,6 +180,8 @@ class SoapHandler(object):
     return faults
 
   def Handle(self, body):
+    if isinstance(body, bytes):
+      body = body.decode('utf-8', 'replace')
     body = str(body)
     obj = soap.Parse(body)
     request_id = obj.Header.get('ID', None)

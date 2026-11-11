@@ -601,6 +601,8 @@ class CPEStateMachine(object):
     self.cpe.startup()
 
   def GetCWMPMethodName(self, message):
+    if isinstance(message, bytes):
+      message = message.decode('utf-8', 'replace')
     message = str(message)
     if message:
       return soap.Parse(message).Body[0].name

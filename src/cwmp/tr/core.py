@@ -90,15 +90,15 @@ class AutoDict(object):
     return True
 
   def iterkeys(self):  #pylint: disable-msg=C6409
-    for (k, v) in self.items():  #pylint: disable-msg=W0612
+    for (k, v) in self.iteritems():  #pylint: disable-msg=W0612
       yield k
 
   def itervalues(self):  #pylint: disable-msg=C6409
-    for (k, v) in self.items():  #pylint: disable-msg=W0612
+    for (k, v) in self.iteritems():  #pylint: disable-msg=W0612
       yield v
 
   def __iter__(self):
-    return iter(self.keys())
+    return self.iterkeys()
 
   def __len__(self):
     count = 0
@@ -107,13 +107,13 @@ class AutoDict(object):
     return count
 
   def keys(self):  #pylint: disable-msg=C6409
-    return list(self.keys())
+    return list(self.iterkeys())
 
   def values(self):  #pylint: disable-msg=C6409
-    return list(self.values())
+    return list(self.itervalues())
 
   def items(self):  #pylint: disable-msg=C6409
-    return list(self.items())
+    return list(self.iteritems())
 
 
 def _Int(s):

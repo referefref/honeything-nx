@@ -77,6 +77,7 @@ import types
 import urllib.request, urllib.parse, urllib.error
 import urllib.parse
 import uuid
+import py2order  # Python 3 port of HoneyThing: headers in Python 2.7 order (tr/vendor/py2order.py)
 
 from tornado import escape
 from tornado import locale
@@ -1038,7 +1039,7 @@ class RequestHandler(object):
                       str(self._status_code) +
                       " " + http.client.responses[self._status_code])]
         lines.extend([(utf8(n) + b(": ") + utf8(v)) for n, v in
-                      itertools.chain(iter(self._headers.items()), self._list_headers)])
+                      itertools.chain(py2order.py2_items(self._headers), self._list_headers)])
         if hasattr(self, "_new_cookie"):
             for cookie in list(self._new_cookie.values()):
                 lines.append(utf8("Set-Cookie: " + cookie.OutputString(None)))

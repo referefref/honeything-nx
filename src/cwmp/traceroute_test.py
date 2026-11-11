@@ -21,9 +21,9 @@
 __author__ = 'apenwarr@google.com (Avery Pennarun)'
 
 import unittest
-from . import google3
-from . import tr.mainloop
-from . import traceroute
+import google3
+import tr.mainloop
+import traceroute
 
 
 class TraceRouteTest(unittest.TestCase):

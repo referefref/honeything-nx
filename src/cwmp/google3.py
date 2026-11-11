@@ -23,4 +23,11 @@ come before other non-python-standard imports.
 __author__ = 'apenwarr@google.com (Avery Pennarun)'
 
 
-from . import tr.google3  #pylint: disable-msg=C6204,W0611
+# Python 3 port: no implicit relative imports, so put this directory on
+# sys.path (as Python 2 effectively did) before importing tr.google3
+import os.path
+import sys
+_mydir = os.path.dirname(os.path.abspath(__file__))
+if _mydir not in sys.path:
+  sys.path.insert(0, _mydir)
+import tr.google3  #pylint: disable-msg=C6204,W0611

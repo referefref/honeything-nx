@@ -25,10 +25,10 @@ import os
 import re
 import subprocess
 import sys
-from . import google3
-from . import tr.core
-from . import tr.mainloop
-from . import tr.tr181_v2_2
+import google3
+import tr.core
+import tr.mainloop
+import tr.tr181_v2_2
 
 from src.logger.HoneythingLogging import HTLogging
 

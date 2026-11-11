@@ -1,6 +1,7 @@
 
 from io import StringIO
 from xml.sax import saxutils
+import py2order  # Python 3 port: attributes in Python 2.7 order
 from keyword import kwlist as PYTHON_KWORD_LIST
 
 __all__ = ['Builder', 'Element']
@@ -29,14 +30,14 @@ class Builder:
         return Element(name, self)
     
     def __str__(self):
+        return self._document.getvalue().strip()
+
+    def __bytes__(self):
         return self._document.getvalue().encode(self._encoding).strip()
-        
-    def __unicode__(self):
-        return self._document.getvalue().decode(self._encoding).strip()
         
     def write(self, content):
         """Write raw content to the document"""
-        if type(content) is not str:
+        if isinstance(content, bytes):
             content = content.decode(self._encoding)
         self._document.write('%s' % content)
 
@@ -92,7 +93,7 @@ class Element:
     def _serialized_attrs(self):
         """Serialize attributes for element insertion"""
         serialized = []
-        for attr, value in list(self.attributes.items()):
+        for attr, value in py2order.py2_items(self.attributes, hops=3):
             serialized.append(' %s=%s' % (
                 self._nameprep(attr), saxutils.quoteattr(value)
             ))

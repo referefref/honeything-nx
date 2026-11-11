@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # Copyright 2011 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -134,7 +134,15 @@ def main():
 
 
 if __name__ == '__main__':
+  # Python 3 port: HoneyThing starts cwmpd with its own interpreter; keep the
+  # process name "cwmpd" that the Python 2 original had (it shows in the
+  # Device.DeviceInfo.ProcessStatus table and in ps)
+  try:
+    with open('/proc/self/comm', 'w') as f:
+      f.write('cwmpd')
+  except (IOError, OSError):
+    pass
   sys.stdout = os.fdopen(1, 'w', 1)  # force line buffering even if redirected
   sys.stderr = os.fdopen(2, 'w', 1)  # force line buffering even if redirected
-  print
+  print()
   main()

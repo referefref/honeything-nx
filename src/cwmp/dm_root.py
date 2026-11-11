@@ -21,10 +21,10 @@
 
 __author__ = 'dgentry@google.com (Denton Gentry)'
 
-from . import google3
-from . import dm.catawampus
-from . import dm.management_server
-from . import tr.core
+import google3
+import dm.catawampus
+import dm.management_server
+import tr.core
 
 
 def _RecursiveImport(name):
@@ -37,7 +37,7 @@ class DeviceModelRoot(tr.core.Exporter):
   def __init__(self, loop, platform):
     tr.core.Exporter.__init__(self)
     if platform:
-      self.device = _RecursiveImport('platform.%s.device' % platform)
+      self.device = _RecursiveImport('cpe_platform.%s.device' % platform)
       (params, objects) = self.device.PlatformInit(name=platform,
                                                    device_model_root=self)
     else:

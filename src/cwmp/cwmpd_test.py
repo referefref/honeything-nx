@@ -25,8 +25,8 @@ import os
 import select
 import subprocess
 import unittest
-from . import google3
-from . import tr.helpers
+import google3
+import tr.helpers
 
 
 class RunserverTest(unittest.TestCase):

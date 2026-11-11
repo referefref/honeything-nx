@@ -7,7 +7,7 @@ GPYLINT=gpylint --disable=W0403,W0613 \
 
 all: tr/all
 
-test: all tr/test dm/test platform/gfmedia/test *_test.py
+test: all tr/test dm/test cpe_platform/gfmedia/test *_test.py
 	set -e; \
 	for d in $(filter %_test.py,$^); do \
 		echo; \
@@ -41,16 +41,16 @@ install:
 		$(DSTDIR)/tr/vendor/tornado $(DSTDIR)/tr/vendor/tornado/tornado \
 		$(DSTDIR)/tr/vendor/tornado/tornado/platform \
 		$(DSTDIR)/tr/vendor/pbkdf2 $(DSTDIR)/tr/vendor/curtain \
-		$(DSTDIR)/platform $(DSTDIR)/platform/gfmedia \
-		$(DSTDIR)/platform/fakecpe $(DSTDIR)/dm
+		$(DSTDIR)/cpe_platform $(DSTDIR)/cpe_platform/gfmedia \
+		$(DSTDIR)/cpe_platform/fakecpe $(DSTDIR)/dm
 	$(INSTALL) -D -m 0755 cwmp cwmpd $(DSTDIR)
 	$(INSTALL) -D -m 0644 *.py $(DSTDIR)
 	$(INSTALL) -D -m 0644 tr/*.py $(DSTDIR)/tr
 	$(INSTALL) -D -m 0644 dm/*.py $(DSTDIR)/dm
-	$(INSTALL) -D -m 0644 platform/*.py $(DSTDIR)/platform
-	$(INSTALL) -D -m 0644 platform/gfmedia/*.py $(DSTDIR)/platform/gfmedia
-	$(INSTALL) -D -m 0644 platform/fakecpe/*.py $(DSTDIR)/platform/fakecpe
-	$(INSTALL) -D -m 0644 platform/fakecpe/version $(DSTDIR)/platform/fakecpe
+	$(INSTALL) -D -m 0644 cpe_platform/*.py $(DSTDIR)/cpe_platform
+	$(INSTALL) -D -m 0644 cpe_platform/gfmedia/*.py $(DSTDIR)/cpe_platform/gfmedia
+	$(INSTALL) -D -m 0644 cpe_platform/fakecpe/*.py $(DSTDIR)/cpe_platform/fakecpe
+	$(INSTALL) -D -m 0644 cpe_platform/fakecpe/version $(DSTDIR)/cpe_platform/fakecpe
 	$(INSTALL) -D -m 0644 tr/vendor/README.third_party $(DSTDIR)/tr/vendor
 	$(INSTALL) -m 0644 tr/vendor/bup/lib/bup/__init__.py $(DSTDIR)/tr/vendor/bup/lib/bup
 	$(INSTALL) -m 0644 tr/vendor/bup/lib/bup/options.py $(DSTDIR)/tr/vendor/bup/lib/bup

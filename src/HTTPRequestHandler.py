@@ -17,9 +17,12 @@
 
 
 import os
-import cgi
 import http.cookies
 import http.server
+import email.message
+import email.parser
+
+from urllib.parse import parse_qs
 
 from .Auth import Auth
 from urllib.parse import urlparse
@@ -28,10 +31,69 @@ from .logger.HTTPLogging import HTTPLogging
 from .logger.HoneythingLogging import HTLogging
 
 
+# Python 3 port: the error page and headers of Python 2's BaseHTTPServer,
+# so that the honeypot answers exactly as the original did under Python 2.7
+PY2_ERROR_MESSAGE = """<head>
+<title>Error response</title>
+</head>
+<body>
+<h1>Error response</h1>
+<p>Error code %(code)d.
+<p>Message: %(message)s.
+<p>Error code explanation: %(code)s = %(explain)s.
+</body>
+"""
+
+
+def parse_header(line):
+    """Replacement for cgi.parse_header (removed in Python 3.13)."""
+    msg = email.message.Message()
+    msg['content-type'] = line or ''
+    params = dict((k.lower(), v) for k, v in msg.get_params()[1:]) if line else {}
+    return (line or '').split(';')[0].strip().lower(), params
+
+
+def parse_multipart(body, ctype_header):
+    """Replacement for cgi.parse_multipart: {name: [value, ...]}."""
+    head = b'Content-Type: ' + ctype_header.encode('latin-1') + b'\r\n\r\n'
+    msg = email.parser.BytesParser().parsebytes(head + body)
+    result = {}
+    if msg.is_multipart():
+        for part in msg.get_payload():
+            name = part.get_param('name', header='content-disposition')
+            if name is None:
+                continue
+            value = part.get_payload(decode=True) or b''
+            result.setdefault(name, []).append(value.decode('latin-1'))
+    return result
+
+
 class HTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
     sys_version = 'UPnP/1.0'
     server_version = 'RomPager/4.07'
+    error_message_format = PY2_ERROR_MESSAGE
+    error_content_type = 'text/html'
+
+    def send_error(self, code, message=None, explain=None):
+        """Python 2.7 BaseHTTPServer.send_error (no Content-Length header)."""
+        try:
+            short, long = self.responses[code]
+        except KeyError:
+            short, long = '???', '???'
+        if message is None:
+            message = short
+        explain = long
+        self.log_error("code %d, message %s", code, message)
+        quoted = message.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        content = (self.error_message_format %
+                   {'code': code, 'message': quoted, 'explain': explain})
+        self.send_response(code, message)
+        self.send_header('Connection', 'close')
+        self.send_header("Content-Type", self.error_content_type)
+        self.end_headers()
+        if self.command != 'HEAD' and code >= 200 and code not in (204, 304):
+            self.wfile.write(content.encode('latin-1', 'replace'))
 
     ht = HTLogging()
     http_logging = HTTPLogging()
@@ -70,13 +132,13 @@ class HTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def do_POST(self):
 
-        ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-        length = int(self.headers.getheader('content-length'))
+        ctype, pdict = parse_header(self.headers.get('content-type'))
+        length = int(self.headers.get('content-length'))
 
         if ctype == 'multipart/form-data':
-            postvars = cgi.parse_multipart(self.rfile, pdict)
+            postvars = parse_multipart(self.rfile.read(length), self.headers.get('content-type'))
         elif ctype == 'application/x-www-form-urlencoded':
-            postvars = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
+            postvars = parse_qs(self.rfile.read(length).decode('latin-1'), keep_blank_values=1)
         else:
             postvars = {}
 
@@ -135,7 +197,7 @@ class HTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
         auth = Auth()
         credentials = auth.get_credentials()
-        cookie = http.cookies.SimpleCookie(self.headers.getheader('Cookie'))
+        cookie = http.cookies.SimpleCookie(self.headers.get('Cookie'))
         session = False
 
         if 'C0' in cookie and 'C1' in cookie:
@@ -177,10 +239,10 @@ class HTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             f = None
 
             try:
-                f = open(path)
+                f = open(path, 'rb')
                 self.wfile.write(f.read())
             except IOError as msg:
-                HTTPRequestHandler.ht.logger.error('Error code: ' + str(msg[0]) + ' , Error message : ' + msg[1])
+                HTTPRequestHandler.ht.logger.error('Error code: ' + str(msg.errno) + ' , Error message : ' + str(msg.strerror))
 
             finally:
                 f.close()
@@ -213,7 +275,7 @@ class HTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     def show_error_page(self):
 
         path = self.path
-        hostname = self.headers.getheader('Host')
+        hostname = self.headers.get('Host')
         uri = self.path
 
         if self.misfortune_cookie():
@@ -222,7 +284,10 @@ class HTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             hostname, uri = self.reflected_xss()
 
         self.send_response(404)
-        self.wfile.write('''\
+        # Python 2 wrote the status line and headers at once, with no blank
+        # line before this page (which starts with a newline)
+        self.flush_headers()
+        self.wfile.write(('''\
 
         <html>
         <head>
@@ -232,7 +297,7 @@ class HTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         <p>Return to <A HREF="http://%s%s">last page</A><p>
         </body></html>
 
-        ''' %(path, hostname, uri))
+        ''' %(path, hostname, uri)).encode('latin-1', 'replace'))
 
         self.log_http(404)
 
@@ -263,7 +328,7 @@ class HTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def misfortune_cookie(self):
 
-        cookie = http.cookies.SimpleCookie(self.headers.getheader('Cookie'))
+        cookie = http.cookies.SimpleCookie(self.headers.get('Cookie'))
 
         if 'C107373883' in cookie:
             return cookie['C107373883'].value
@@ -278,7 +343,7 @@ class HTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def reflected_xss(self):
 
-        referer = self.headers.getheader('Referer')
+        referer = self.headers.get('Referer')
 
         if referer and "script" in referer:
             hostname, uri = "", ""
@@ -303,10 +368,10 @@ class HTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
 
         try:
-            with open(path) as fp:
+            with open(path, 'rb') as fp:
                 self.wfile.write(fp.read())
         except IOError as msg:
-            HTTPRequestHandler.ht.logger.error('Error code: ' + str(msg[0]) + ' , Error message : ' + msg[1])
+            HTTPRequestHandler.ht.logger.error('Error code: ' + str(msg.errno) + ' , Error message : ' + str(msg.strerror))
 
         self.log_http(200)
 

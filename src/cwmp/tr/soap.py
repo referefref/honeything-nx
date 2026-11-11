@@ -193,6 +193,9 @@ class NodeWrapper(object):
   def iteritems(self):
     return iter(self._dict.items())
 
+  def items(self):  # Python 3 port: callers of iteritems() now call items()
+    return list(self._dict.items())
+
   def __str__(self):
     out = []
     for key, value in self._list:

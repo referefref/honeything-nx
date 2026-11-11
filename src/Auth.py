@@ -55,7 +55,7 @@ class Auth:
 
     def get_credentials(self):
 
-        credentials = {'user': hashlib.md5(self.username).hexdigest(),
-                       'pass': hashlib.md5(self.password).hexdigest()}
+        credentials = {'user': hashlib.md5(self.username.encode('utf-8')).hexdigest(),
+                       'pass': hashlib.md5(self.password.encode('utf-8')).hexdigest()}
 
         return credentials

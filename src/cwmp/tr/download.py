@@ -186,7 +186,9 @@ class Download(object):
     wait_start_time = self.stateobj.wait_start_time
 
     # sanity checks
-    if wait_start_time > now:
+    # (Python 3 port: the stored value can be "" (see persistobj._ToJson);
+    # Python 2 ordered any str after any number, so it became "now")
+    if not isinstance(wait_start_time, (int, float)) or wait_start_time > now:
       wait_start_time = now
     when = wait_start_time + delay_seconds
     if when < now:

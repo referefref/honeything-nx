@@ -40,8 +40,15 @@ class CWMPLogging(BaseLogging):
 
         fmt = self.cfg.getConfig('logging', 'cwmp_data_format')
 
+        data = message['data']
         if fmt == 'hex':
-            message['data'] = message['data'].encode('hex')
+            if not isinstance(data, bytes):
+                data = str(data).encode('utf-8')
+            message['data'] = data.hex()
+        elif isinstance(data, bytes):
+            message['data'] = data.decode('utf-8', 'replace')
+        else:
+            message['data'] = str(data)
 
         if not message['method']:
             message['method'] = '-'

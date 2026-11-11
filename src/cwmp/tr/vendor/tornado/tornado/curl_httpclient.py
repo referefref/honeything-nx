@@ -200,7 +200,7 @@ class CurlAsyncHTTPClient(AsyncHTTPClient):
                     (request, callback) = self._requests.popleft()
                     curl.info = {
                         "headers": httputil.HTTPHeaders(),
-                        "buffer": io.StringIO(),
+                        "buffer": io.BytesIO(),
                         "request": request,
                         "callback": callback,
                         "curl_start_time": monotime(),
@@ -375,7 +375,7 @@ def _curl_setup_request(curl, request, buffer, headers):
 
     # Handle curl's cryptic options for every individual HTTP method
     if request.method in ("POST", "PUT"):
-        request_buffer = io.StringIO(utf8(request.body))
+        request_buffer = io.BytesIO(utf8(request.body))
         curl.setopt(pycurl.READFUNCTION, request_buffer.read)
         if request.method == "POST":
             def ioctl(cmd):
@@ -418,6 +418,9 @@ def _curl_setup_request(curl, request, buffer, headers):
 
 def _curl_header_callback(headers, header_line):
     # header_line as returned by curl includes the end-of-line characters.
+    # (Python 3: pycurl passes bytes)
+    if isinstance(header_line, bytes):
+        header_line = header_line.decode('latin-1')
     header_line = header_line.strip()
     if header_line.startswith("HTTP/"):
         headers.clear()

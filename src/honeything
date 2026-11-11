@@ -28,7 +28,7 @@ case "$1" in
         echo -n "Starting HoneyThing: "
 
         # Start the daemon
-        nohup /usr/bin/python /opt/honeything/bin/honeything > /dev/null 2>&1 &
+        nohup /usr/bin/python3 /opt/honeything/bin/honeything > /dev/null 2>&1 &
         echo $! > $pidfile
 
         sleep 1
