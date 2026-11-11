@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, with_statement
+
 
 import os
 import traceback
@@ -70,21 +70,21 @@ class TemplateTest(LogTrapTestCase):
                          b("expr {{jquery expr}}"))
 
     def test_unicode_template(self):
-        template = Template(utf8(u"\u00e9"))
-        self.assertEqual(template.generate(), utf8(u"\u00e9"))
+        template = Template(utf8("\u00e9"))
+        self.assertEqual(template.generate(), utf8("\u00e9"))
 
     def test_unicode_literal_expression(self):
         # Unicode literals should be usable in templates.  Note that this
         # test simulates unicode characters appearing directly in the
         # template file (with utf8 encoding), i.e. \u escapes would not
         # be used in the template file itself.
-        if str is unicode:
+        if str is str:
             # python 3 needs a different version of this test since
             # 2to3 doesn't run on template internals
-            template = Template(utf8(u'{{ "\u00e9" }}'))
+            template = Template(utf8('{{ "\u00e9" }}'))
         else:
-            template = Template(utf8(u'{{ u"\u00e9" }}'))
-        self.assertEqual(template.generate(), utf8(u"\u00e9"))
+            template = Template(utf8('{{ u"\u00e9" }}'))
+        self.assertEqual(template.generate(), utf8("\u00e9"))
 
     def test_custom_namespace(self):
         loader = DictLoader({"test.html": "{{ inc(5) }}"}, namespace={"inc": lambda x: x + 1})
@@ -330,4 +330,4 @@ class TemplateLoaderTest(LogTrapTestCase):
     def test_utf8_in_file(self):
         tmpl = self.loader.load("utf8.html")
         result = tmpl.generate()
-        self.assertEqual(to_unicode(result).strip(), u"H\u00e9llo")
+        self.assertEqual(to_unicode(result).strip(), "H\u00e9llo")

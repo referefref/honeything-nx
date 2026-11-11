@@ -51,15 +51,15 @@ details and documentation.
 """
 
 import cgi
-import cStringIO
-import escape
-import httplib
-import httputil
+import io
+from . import escape
+import http.client
+from . import httputil
 import logging
 import sys
 import time
-import urllib
-import web
+import urllib.request, urllib.parse, urllib.error
+from . import web
 
 class WSGIApplication(web.Application):
     """A WSGI-equivalent of web.Application.
@@ -75,10 +75,10 @@ class WSGIApplication(web.Application):
         handler = web.Application.__call__(self, HTTPRequest(environ))
         assert handler._finished
         status = str(handler._status_code) + " " + \
-            httplib.responses[handler._status_code]
-        headers = handler._headers.items()
+            http.client.responses[handler._status_code]
+        headers = list(handler._headers.items())
         for cookie_dict in getattr(handler, "_new_cookies", []):
-            for cookie in cookie_dict.values():
+            for cookie in list(cookie_dict.values()):
                 headers.append(("Set-Cookie", cookie.OutputString(None)))
         start_response(status, headers)
         return handler._write_buffer
@@ -89,15 +89,15 @@ class HTTPRequest(object):
     def __init__(self, environ):
         """Parses the given WSGI environ to construct the request."""
         self.method = environ["REQUEST_METHOD"]
-        self.path = urllib.quote(environ.get("SCRIPT_NAME", ""))
-        self.path += urllib.quote(environ.get("PATH_INFO", ""))
+        self.path = urllib.parse.quote(environ.get("SCRIPT_NAME", ""))
+        self.path += urllib.parse.quote(environ.get("PATH_INFO", ""))
         self.uri = self.path
         self.arguments = {}
         self.query = environ.get("QUERY_STRING", "")
         if self.query:
             self.uri += "?" + self.query
             arguments = cgi.parse_qs(self.query)
-            for name, values in arguments.iteritems():
+            for name, values in arguments.items():
                 values = [v for v in values if v]
                 if values: self.arguments[name] = values
         self.version = "HTTP/1.1"
@@ -124,7 +124,7 @@ class HTTPRequest(object):
         self.files = {}
         content_type = self.headers.get("Content-Type", "")
         if content_type.startswith("application/x-www-form-urlencoded"):
-            for name, values in cgi.parse_qs(self.body).iteritems():
+            for name, values in cgi.parse_qs(self.body).items():
                 self.arguments.setdefault(name, []).extend(values)
         elif content_type.startswith("multipart/form-data"):
             if 'boundary=' in content_type:
@@ -269,7 +269,7 @@ class WSGIContainer(object):
             "SERVER_PROTOCOL": request.version,
             "wsgi.version": (1, 0),
             "wsgi.url_scheme": request.protocol,
-            "wsgi.input": cStringIO.StringIO(escape.utf8(request.body)),
+            "wsgi.input": io.StringIO(escape.utf8(request.body)),
             "wsgi.errors": sys.stderr,
             "wsgi.multithread": False,
             "wsgi.multiprocess": True,
@@ -279,7 +279,7 @@ class WSGIContainer(object):
             environ["CONTENT_TYPE"] = request.headers["Content-Type"]
         if "Content-Length" in request.headers:
             environ["CONTENT_LENGTH"] = request.headers["Content-Length"]
-        for key, value in request.headers.iteritems():
+        for key, value in request.headers.items():
             environ["HTTP_" + key.replace("-", "_").upper()] = value
         return environ
 

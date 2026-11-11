@@ -18,20 +18,20 @@
 
 import cgi
 import errno
-import httputil
-import ioloop
-import iostream
+from . import httputil
+from . import ioloop
+from . import iostream
 import logging
 import os
 import socket
 import time
-import urlparse
+import urllib.parse
 
 try:
     import fcntl
 except ImportError:
     if os.name == 'nt':
-        import win32_support as fcntl
+        from . import win32_support as fcntl
     else:
         raise
 
@@ -204,7 +204,7 @@ class HTTPServer(object):
         while True:
             try:
                 connection, address = self._socket.accept()
-            except socket.error, e:
+            except socket.error as e:
                 if e[0] in (errno.EWOULDBLOCK, errno.EAGAIN):
                     return
                 raise
@@ -300,7 +300,7 @@ class HTTPConnection(object):
         if self._request.method == "POST":
             if content_type.startswith("application/x-www-form-urlencoded"):
                 arguments = cgi.parse_qs(self._request.body)
-                for name, values in arguments.iteritems():
+                for name, values in arguments.items():
                     values = [v for v in values if v]
                     if values:
                         self._request.arguments.setdefault(name, []).extend(
@@ -396,12 +396,12 @@ class HTTPRequest(object):
         self._start_time = time.time()
         self._finish_time = None
 
-        scheme, netloc, path, query, fragment = urlparse.urlsplit(uri)
+        scheme, netloc, path, query, fragment = urllib.parse.urlsplit(uri)
         self.path = path
         self.query = query
         arguments = cgi.parse_qs(query)
         self.arguments = {}
-        for name, values in arguments.iteritems():
+        for name, values in arguments.items():
             values = [v for v in values if v]
             if values: self.arguments[name] = values
 

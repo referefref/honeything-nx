@@ -333,7 +333,7 @@ class Interface(object):
                   "rx_frame", "rx_compressed", "rx_multicast", "tx_bytes",
                   "tx_packets", "tx_errs", "tx_drop", "tx_fifo", "tx_colls",
                   "tx_carrier", "tx_compressed"]
-        return dict(zip(titles, stats))
+        return dict(list(zip(titles, stats)))
 
     index = property(get_index)
     mac = property(get_mac, set_mac)

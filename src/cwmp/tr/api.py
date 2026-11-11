@@ -26,7 +26,7 @@ API calls; it's just a python version of the API.
 
 __author__ = 'apenwarr@google.com (Avery Pennarun)'
 
-import download
+from . import download
 
 from src.logger.HoneythingLogging import HTLogging
 
@@ -274,7 +274,7 @@ class CPE(TR069Service):
   def SetParameterAttributes(self, parameter_list):
     """Set attributes (access control, notifications) on some parameters."""
     param_name = parameter_list['Name']
-    for attr, attr_value in parameter_list.iteritems():
+    for attr, attr_value in parameter_list.items():
       if attr != 'Name':
         self._SetParameterAttribute(param_name, attr, attr_value)
 

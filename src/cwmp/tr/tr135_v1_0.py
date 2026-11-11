@@ -14,7 +14,7 @@
 #
 """Auto-generated from spec: urn:broadband-forum-org:tr-135-1-0."""
 
-import core
+from . import core
 
 
 class STBService_v1_0(core.Exporter):
@@ -924,4 +924,4 @@ class STBService_v1_0(core.Exporter):
 
 
 if __name__ == '__main__':
-  print core.DumpSchema(STBService_v1_0)
+  print(core.DumpSchema(STBService_v1_0))

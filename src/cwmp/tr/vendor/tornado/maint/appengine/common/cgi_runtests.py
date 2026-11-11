@@ -58,15 +58,15 @@ def all():
     return unittest.defaultTestLoader.loadTestsFromNames(TEST_MODULES)
 
 def main():
-    print "Content-Type: text/plain\r\n\r\n",
+    print("Content-Type: text/plain\r\n\r\n", end=' ')
 
     import_everything()
 
     try:
         unittest.main(defaultTest="all", argv=sys.argv)
-    except SystemExit, e:
+    except SystemExit as e:
         if e.code == 0:
-            print "PASS"
+            print("PASS")
         else:
             raise
 

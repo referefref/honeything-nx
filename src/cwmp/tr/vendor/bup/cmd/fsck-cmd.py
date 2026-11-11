@@ -71,7 +71,7 @@ def git_verify(base):
     if opt.quick:
         try:
             quick_verify(base)
-        except Exception, e:
+        except Exception as e:
             debug('error: %s\n' % e)
             return 1
         return 0
@@ -87,31 +87,31 @@ def do_pack(base, last):
             if opt.repair:
                 rresult = par2_repair(base)
                 if rresult != 0:
-                    print '%s par2 repair: failed (%d)' % (last, rresult)
+                    print('%s par2 repair: failed (%d)' % (last, rresult))
                     code = rresult
                 else:
-                    print '%s par2 repair: succeeded (0)' % last
+                    print('%s par2 repair: succeeded (0)' % last)
                     code = 100
             else:
-                print '%s par2 verify: failed (%d)' % (last, vresult)
+                print('%s par2 verify: failed (%d)' % (last, vresult))
                 code = vresult
         else:
-            print '%s ok' % last
+            print('%s ok' % last)
     elif not opt.generate or (par2_ok and not par2_exists):
         gresult = git_verify(base)
         if gresult != 0:
-            print '%s git verify: failed (%d)' % (last, gresult)
+            print('%s git verify: failed (%d)' % (last, gresult))
             code = gresult
         else:
             if par2_ok and opt.generate:
                 presult = par2_generate(base)
                 if presult != 0:
-                    print '%s par2 create: failed (%d)' % (last, presult)
+                    print('%s par2 create: failed (%d)' % (last, presult))
                     code = presult
                 else:
-                    print '%s ok' % last
+                    print('%s ok' % last)
             else:
-                print '%s ok' % last
+                print('%s ok' % last)
     else:
         assert(opt.generate and (not par2_ok or par2_exists))
         debug('    skipped: par2 file already generated.\n')
@@ -189,7 +189,7 @@ for name in extra:
         else: # child
             try:
                 sys.exit(do_pack(base, last))
-            except Exception, e:
+            except Exception as e:
                 log('exception: %r\n' % e)
                 sys.exit(99)
                 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import absolute_import, division, with_statement
+
 import datetime
 import unittest
 from tornado.testing import AsyncTestCase, LogTrapTestCase

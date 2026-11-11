@@ -51,7 +51,7 @@ def handle_sigchld(sig, frame):
 
 def main():
     parse_command_line()
-    for i in xrange(options.num_runs):
+    for i in range(options.num_runs):
         run()
 
 def run():

@@ -73,7 +73,7 @@ class HTTPHeaders(dict):
         If a header has multiple values, multiple pairs will be
         returned with the same name.
         """
-        for name, list in self._as_list.iteritems():
+        for name, list in self._as_list.items():
             for value in list:
                 yield (name, value)
 
@@ -122,7 +122,7 @@ class HTTPHeaders(dict):
 
     def update(self, *args, **kwargs):
         # dict.update bypasses our __setitem__
-        for k, v in dict(*args, **kwargs).iteritems():
+        for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
     @staticmethod

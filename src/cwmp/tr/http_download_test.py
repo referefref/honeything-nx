@@ -25,8 +25,8 @@ import shutil
 import tempfile
 import unittest
 
-import google3
-import http_download
+from . import google3
+from . import http_download
 
 
 mock_http_clients = []

@@ -27,7 +27,7 @@ import random
 import subprocess
 import traceback
 
-import google3
+from . import google3
 
 import dm.brcmmoca
 import dm.brcmwifi
@@ -46,9 +46,9 @@ import tr.tr098_v1_2
 import tr.tr181_v2_2 as tr181
 import tr.x_catawampus_tr181_2_0
 
-import gfibertv
-import gvsb
-import stbservice
+from . import gfibertv
+from . import gvsb
+from . import stbservice
 
 
 BASE98IGD = tr.tr098_v1_4.InternetGatewayDevice_v1_10.InternetGatewayDevice
@@ -127,7 +127,7 @@ class PlatformConfig(platform_config.PlatformConfigMeta):
 
     if rc != 0:
       # Log the failure
-      print '%s timeout %s failed %d' % (SET_ACS, self.acs_timeout_url, rc)
+      print('%s timeout %s failed %d' % (SET_ACS, self.acs_timeout_url, rc))
 
   def AcsAccessAttempt(self, url):
     """Called when a connection to the ACS is attempted."""
@@ -270,7 +270,7 @@ class Installer(tr.download.Installer):
 
   def install(self, file_type, target_filename, callback):
     """Install self.filename to disk, then call callback."""
-    print 'Installing: %r %r' % (file_type, target_filename)
+    print('Installing: %r %r' % (file_type, target_filename))
     ftype = file_type.split()
     if ftype and ftype[0] != '1':
       self._call_callback(INTERNAL_ERROR,
@@ -308,13 +308,13 @@ class Installer(tr.download.Installer):
     except OSError:   # returns EWOULDBLOCK
       pass
     if inp and inp.strip() != '.':
-      print 'ginstall: %s' % inp.strip()
+      print('ginstall: %s' % inp.strip())
     if self._ginstall.poll() >= 0:
       self._ioloop.remove_handler(self._ginstall.stdout.fileno())
       if self._ginstall.returncode == 0:
         self._call_callback(0, '')
       else:
-        print 'ginstall: exit code %d' % self._ginstall.poll()
+        print('ginstall: exit code %d' % self._ginstall.poll())
         self._call_callback(INTERNAL_ERROR, 'Unable to install image.')
 
 
@@ -411,13 +411,13 @@ class FanReadGpio(CATA181DI.TemperatureStatus.X_CATAWAMPUS_ORG_Fan):
     try:
       f = open(self._speed_filename, 'r')
     except IOError as e:
-      print 'Fan speed file %r: %s' % (self._speed_filename, e)
+      print('Fan speed file %r: %s' % (self._speed_filename, e))
       return -1
     try:
       rps2 = int(f.read())
       return rps2 * 30
     except ValueError as e:
-      print 'FanReadGpio RPM %r: %s' % (self._speed_filename, e)
+      print('FanReadGpio RPM %r: %s' % (self._speed_filename, e))
       return -1
 
   @property
@@ -425,12 +425,12 @@ class FanReadGpio(CATA181DI.TemperatureStatus.X_CATAWAMPUS_ORG_Fan):
     try:
       f = open(self._percent_filename, 'r')
     except IOError as e:
-      print 'Fan percent file %r: %s' % (self._percent_filename, e)
+      print('Fan percent file %r: %s' % (self._percent_filename, e))
       return -1
     try:
       return int(f.read())
     except ValueError as e:
-      print 'FanReadGpio DesiredPercentage %r: %s' % (self._percent_filename, e)
+      print('FanReadGpio DesiredPercentage %r: %s' % (self._percent_filename, e))
       return -1
 
 

@@ -14,8 +14,8 @@
 #
 """Auto-generated from spec: urn:broadband-forum-org:tr-140-1-1."""
 
-import core
-from tr140_v1_0 import StorageService_v1_0
+from . import core
+from .tr140_v1_0 import StorageService_v1_0
 
 
 class StorageService_v1_1(StorageService_v1_0):
@@ -64,4 +64,4 @@ class StorageService_v1_1(StorageService_v1_0):
 
 
 if __name__ == '__main__':
-  print core.DumpSchema(StorageService_v1_1)
+  print(core.DumpSchema(StorageService_v1_1))

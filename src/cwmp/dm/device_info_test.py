@@ -23,9 +23,9 @@ __author__ = 'dgentry@google.com (Denton Gentry)'
 import os
 import unittest
 
-import google3
+from . import google3
 import tr.core
-import device_info
+from . import device_info
 import tornado.testing
 
 
@@ -203,7 +203,7 @@ class DeviceInfoTest(tornado.testing.AsyncTestCase):
     ps = device_info.ProcessStatusLinux26(self.io_loop)
     processes = ps.ProcessList
     self.assertEqual(len(processes), 6)
-    for p in processes.values():
+    for p in list(processes.values()):
       fake_p = fake_processes[p.PID]
       self.assertEqual(tr.core.Dump(fake_p), tr.core.Dump(p))
 

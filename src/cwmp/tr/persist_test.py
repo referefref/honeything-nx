@@ -24,9 +24,9 @@ import os
 import tempfile
 import unittest
 
-import google3
-import core
-import persist
+from . import google3
+from . import core
+from . import persist
 
 
 class Leaf(core.Exporter):
@@ -51,20 +51,20 @@ class PersistTest(unittest.TestCase):
   def testPersist(self):
     fd, dbname = tempfile.mkstemp()
     os.close(fd)
-    print 'database file: %s' % dbname
+    print('database file: %s' % dbname)
 
     t = Tree(5, Leaf(6))
     t.SubList[7] = Tree(77, Tree(777, Leaf(7777)))
     t.SubList[11] = Tree(88, Tree(888, Leaf(8888)))
     t.SubList[11].SubList[9] = Tree(99, Leaf(9999))
-    print core.Dump(t)
+    print(core.Dump(t))
     p = persist.Store(dbname, t)
     p.Save()
 
     t2 = Tree(0, Leaf(0))
     p2 = persist.Store(dbname, t2)
     p2.Load()
-    print core.Dump(t2)
+    print(core.Dump(t2))
 
     self.assertEqual(t.Number, 5)
     self.assertEqual(t2.Number, 5)

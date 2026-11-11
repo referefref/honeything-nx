@@ -21,13 +21,13 @@
 __author__ = 'dgentry@google.com (Denton Gentry)'
 
 import os
-import SimpleXMLRPCServer
+import xmlrpc.server
 import tempfile
 import threading
 import unittest
-import xmlrpclib
-import google3
-import gfibertv
+import xmlrpc.client
+from . import google3
+from . import gfibertv
 
 
 class TvPropertyRpcs(object):
@@ -50,13 +50,13 @@ class TvPropertyRpcs(object):
     return ''
 
   def ListNodes(self):
-    return self.properties.keys()
+    return list(self.properties.keys())
 
   def Ping(self):
     return ''
 
 
-class TvXMLRPCServer(SimpleXMLRPCServer.SimpleXMLRPCServer):
+class TvXMLRPCServer(xmlrpc.server.SimpleXMLRPCServer):
   allow_reuse_address = 2
 
 
@@ -124,7 +124,7 @@ class GfiberTvTests(unittest.TestCase):
 
 
   def tearDown(self):
-    xmlrpclib.ServerProxy('http://localhost:%d' % srv_port).Quit()
+    xmlrpc.client.ServerProxy('http://localhost:%d' % srv_port).Quit()
     self.server_thread.join()
     os.unlink(gfibertv.NICKFILE)
 
@@ -201,7 +201,7 @@ class GfiberTvTests(unittest.TestCase):
     gftv.DevicePropertiesList[idx].CommitTransaction()
 
     gftv.DevicePropertiesList[idx2].StartTransaction()
-    uni_name = u'\u212ced\nroom\n\r!'.encode('utf-8')
+    uni_name = '\u212ced\nroom\n\r!'.encode('utf-8')
     gftv.DevicePropertiesList[idx2].NickName = uni_name
     gftv.DevicePropertiesList[idx2].SerialNumber = '56789'
     gftv.DevicePropertiesList[idx2].CommitTransaction()
@@ -217,7 +217,7 @@ class GfiberTvTests(unittest.TestCase):
     last_line = last_line.strip()
 
     self.assertTrue('12345/nickname=testroom\n' in lines)
-    self.assertTrue('56789/nickname=\u212cedroom!\n' in lines)
+    self.assertTrue('56789/nickname=\\u212cedroom!\n' in lines)
     self.assertTrue(last_line.startswith('SERIALS='))
     split1 = last_line.split('=')
     self.assertEqual(2, len(split1))

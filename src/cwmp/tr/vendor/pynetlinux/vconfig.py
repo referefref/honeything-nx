@@ -6,7 +6,7 @@ __author__ = 'dgentry@google.com (Denton Gentry)'
 
 import fcntl
 import struct
-import ifconfig
+from . import ifconfig
 
 """
 This file makes the following assumptions about data structures:

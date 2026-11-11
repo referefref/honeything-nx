@@ -104,16 +104,16 @@ class PersistentObject(object):
     return self._fields.get(name, None)
 
   def values(self):
-    return self._fields.values()
+    return list(self._fields.values())
 
   def items(self):
-    return self._fields.items()
+    return list(self._fields.items())
 
 
 
 
   def _ToJson(self):
-    for k, v in self._fields.items():
+    for k, v in list(self._fields.items()):
         #print k + "->" + str(type(v))
         if type(v) is not str and type(v) is not int:
             self._fields[k] = ""

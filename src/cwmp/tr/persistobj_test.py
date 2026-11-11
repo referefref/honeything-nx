@@ -25,8 +25,8 @@ import shutil
 import tempfile
 import unittest
 
-import google3
-import persistobj
+from . import google3
+from . import persistobj
 
 
 class PersistentObjectTest(unittest.TestCase):

@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, with_statement
+
 
 import collections
 from contextlib import closing
@@ -219,7 +219,7 @@ class SimpleHTTPClientTestCase(AsyncHTTPTestCase, LogTrapTestCase):
             return
         try:
             self.http_server.listen(self.get_http_port(), address='::1')
-        except socket.gaierror, e:
+        except socket.gaierror as e:
             if e.args[0] == socket.EAI_ADDRFAMILY:
                 # python supports ipv6, but it's not configured on the network
                 # interface, so skip this test.

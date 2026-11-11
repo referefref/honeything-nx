@@ -16,12 +16,12 @@ total_restored = 0
 
 def verbose1(s):
     if opt.verbose >= 1:
-        print s
+        print(s)
 
 
 def verbose2(s):
     if opt.verbose >= 2:
-        print s
+        print(s)
 
 
 def plog(s):
@@ -74,7 +74,7 @@ for d in extra:
     path,name = os.path.split(d)
     try:
         n = top.lresolve(d)
-    except vfs.NodeError, e:
+    except vfs.NodeError as e:
         add_error(e)
         continue
     isdir = stat.S_ISDIR(n.mode)

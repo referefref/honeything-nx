@@ -29,11 +29,11 @@ you use a recent version of ``libcurl`` and ``pycurl``.  Currently the minimum
 supported version is 7.18.2, and the recommended version is 7.21.1 or newer.
 """
 
-from __future__ import absolute_import, division, with_statement
+
 
 import calendar
 import email.utils
-import httplib
+import http.client
 import weakref
 
 from tornado.escape import utf8
@@ -208,7 +208,7 @@ class AsyncHTTPClient(object):
 
            AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
         """
-        if isinstance(impl, (unicode, bytes_type)):
+        if isinstance(impl, (str, bytes_type)):
             impl = import_object(impl)
         if impl is not None and not issubclass(impl, AsyncHTTPClient):
             raise ValueError("Invalid AsyncHTTPClient implementation")
@@ -391,7 +391,7 @@ class HTTPResponse(object):
             raise self.error
 
     def __repr__(self):
-        args = ",".join("%s=%r" % i for i in self.__dict__.iteritems())
+        args = ",".join("%s=%r" % i for i in self.__dict__.items())
         return "%s(%s)" % (self.__class__.__name__, args)
 
 
@@ -411,7 +411,7 @@ class HTTPError(Exception):
     """
     def __init__(self, code, message=None, response=None):
         self.code = code
-        message = message or httplib.responses.get(code, "Unknown")
+        message = message or http.client.responses.get(code, "Unknown")
         self.response = response
         Exception.__init__(self, "HTTP %d: %s" % (self.code, message))
 
@@ -430,7 +430,7 @@ def main():
                                     follow_redirects=options.follow_redirects,
                                     validate_cert=options.validate_cert,
                                     )
-        except HTTPError, e:
+        except HTTPError as e:
             if e.response is not None:
                 response = e.response
             else:

@@ -102,7 +102,7 @@ class PackMidx:
         return None
 
     def __iter__(self):
-        for i in xrange(self._fanget(self.entries-1)):
+        for i in range(self._fanget(self.entries-1)):
             yield buffer(self.shatable, i*20, 20)
 
     def __len__(self):

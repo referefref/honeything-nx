@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, with_statement
+
 import functools
 from tornado.escape import url_escape
 from tornado.httpclient import AsyncHTTPClient
@@ -261,7 +261,7 @@ class GenTest(AsyncTestCase):
 
         @gen.engine
         def outer():
-            for i in xrange(10):
+            for i in range(10):
                 yield gen.Task(inner)
             stack_increase = len(stack_context._state.contexts) - initial_stack_depth
             self.assertTrue(stack_increase <= 2)

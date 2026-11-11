@@ -24,8 +24,8 @@ import os
 import tempfile
 import unittest
 
-import google3
-import igd_time
+from . import google3
+from . import igd_time
 
 
 def TimeNow():

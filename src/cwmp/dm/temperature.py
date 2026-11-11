@@ -304,7 +304,7 @@ class SensorReadFromFile(object):
     try:
       return GetNumberFromFile(self._filename)
     except (IOError, ValueError):
-      print 'TempFromFile %s: bad value' % self._filename
+      print('TempFromFile %s: bad value' % self._filename)
       return BADCELSIUS
 
 
@@ -355,7 +355,7 @@ class FanReadFileRPS(CATA181DI.TemperatureStatus.X_CATAWAMPUS_ORG_Fan):
       rps = GetNumberFromFile(self._filename)
       return rps * 60
     except ValueError as e:
-      print 'FanReadFileRPS bad value %s' % self._filename
+      print('FanReadFileRPS bad value %s' % self._filename)
       return -1
 
   @property

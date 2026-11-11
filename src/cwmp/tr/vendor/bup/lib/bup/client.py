@@ -21,7 +21,7 @@ def _raw_write_bwlimit(f, buf, bwcount, bwtime):
         # the average back up to bwlimit - that will risk overflowing the
         # outbound queue, which defeats the purpose.  So if we fall behind
         # by more than one block delay, we shouldn't ever try to catch up.
-        for i in xrange(0,len(buf),4096):
+        for i in range(0,len(buf),4096):
             now = time.time()
             next = max(now, bwtime + 1.0*bwcount/bwlimit)
             time.sleep(next-now)
@@ -75,8 +75,8 @@ class Client:
                     self.pout = self.p.stdout
                     self.pin = self.p.stdin
                     self.conn = Conn(self.pout, self.pin)
-                except OSError, e:
-                    raise ClientError, 'connect: %s' % e, sys.exc_info()[2]
+                except OSError as e:
+                    raise ClientError('connect: %s' % e).with_traceback(sys.exc_info()[2])
             elif self.protocol == 'bup':
                 self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.sock.connect((self.host, atoi(self.port) or 1982))
@@ -94,7 +94,7 @@ class Client:
     def __del__(self):
         try:
             self.close()
-        except IOError, e:
+        except IOError as e:
             if e.errno == errno.EPIPE:
                 pass
             else:
@@ -130,8 +130,8 @@ class Client:
                                   % rv)
         try:
             return self.conn.check_ok()
-        except Exception, e:
-            raise ClientError, e, sys.exc_info()[2]
+        except Exception as e:
+            raise ClientError(e).with_traceback(sys.exc_info()[2])
 
     def check_busy(self):
         if self._busy:
@@ -335,8 +335,8 @@ class PackWriter_Remote(git.PackWriter):
         try:
             (self._bwcount, self._bwtime) = _raw_write_bwlimit(
                     self.file, outbuf, self._bwcount, self._bwtime)
-        except IOError, e:
-            raise ClientError, e, sys.exc_info()[2]
+        except IOError as e:
+            raise ClientError(e).with_traceback(sys.exc_info()[2])
         self.outbytes += len(data)
         self.count += 1
 

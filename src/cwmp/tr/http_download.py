@@ -24,8 +24,8 @@ import random
 import sys
 import tempfile
 
-import google3
-import helpers
+from . import google3
+from . import helpers
 import tornado
 import tornado.httpclient
 import tornado.ioloop
@@ -143,7 +143,7 @@ class HttpDownload(object):
                                            realm=realm,
                                            password=password)
 
-    returnlist = [('%s="%s"' % (k, v)) for k, v in returns.items()]
+    returnlist = [('%s="%s"' % (k, v)) for k, v in list(returns.items())]
     return 'Digest %s' % ','.join(returnlist)
 
   def _async_fetch_callback(self, response):

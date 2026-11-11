@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import absolute_import, division, with_statement
+
 
 from tornado.escape import utf8, _unicode, native_str
 from tornado.httpclient import HTTPRequest, HTTPResponse, HTTPError, AsyncHTTPClient, main
@@ -18,13 +18,13 @@ import os.path
 import re
 import socket
 import sys
-import urlparse
+import urllib.parse
 import zlib
 
 try:
     from io import BytesIO  # python 3
 except ImportError:
-    from cStringIO import StringIO as BytesIO  # python 2
+    from io import StringIO as BytesIO  # python 2
 
 try:
     import ssl  # python 2.6+
@@ -139,7 +139,7 @@ class _HTTPConnection(object):
         # Timeout handle returned by IOLoop.add_timeout
         self._timeout = None
         with stack_context.StackContext(self.cleanup):
-            parsed = urlparse.urlsplit(_unicode(self.request.url))
+            parsed = urllib.parse.urlsplit(_unicode(self.request.url))
             if ssl is None and parsed.scheme == "https":
                 raise ValueError("HTTPS requires either python2.6+ or "
                                  "curl_httpclient")
@@ -320,7 +320,7 @@ class _HTTPConnection(object):
     def cleanup(self):
         try:
             yield
-        except Exception, e:
+        except Exception as e:
             logging.warning("uncaught exception", exc_info=True)
             self._run_callback(HTTPResponse(self.request, 599, error=e,
                                 request_time=monotime() - self.start_time,
@@ -396,7 +396,7 @@ class _HTTPConnection(object):
             self.request.max_redirects > 0 and
             self.code in (301, 302, 303, 307)):
             new_request = copy.copy(self.request)
-            new_request.url = urlparse.urljoin(self.request.url,
+            new_request.url = urllib.parse.urljoin(self.request.url,
                                                self.headers["Location"])
             new_request.max_redirects -= 1
             del new_request.headers["Host"]

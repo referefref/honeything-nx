@@ -23,8 +23,8 @@ __author__ = 'dgentry@google.com (Denton Gentry)'
 import time
 import unittest
 
-import google3
-import cwmp_session
+from . import google3
+from . import cwmp_session
 
 
 class CwmpSessionTest(unittest.TestCase):

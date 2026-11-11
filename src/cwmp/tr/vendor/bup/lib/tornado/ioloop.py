@@ -33,8 +33,8 @@ try:
     import fcntl
 except ImportError:
     if os.name == 'nt':
-        import win32_support
-        import win32_support as fcntl
+        from . import win32_support
+        from . import win32_support as fcntl
     else:
         raise
 
@@ -223,7 +223,7 @@ class IOLoop(object):
 
             try:
                 event_pairs = self._impl.poll(poll_timeout)
-            except Exception, e:
+            except Exception as e:
                 # Depending on python version and IOLoop implementation,
                 # different exception types may be thrown and there are
                 # two ways EINTR might be signaled:
@@ -252,7 +252,7 @@ class IOLoop(object):
                     self._handlers[fd](fd, events)
                 except (KeyboardInterrupt, SystemExit):
                     raise
-                except (OSError, IOError), e:
+                except (OSError, IOError) as e:
                     if e[0] == errno.EPIPE:
                         # Happens when the client closes the connection
                         pass
@@ -464,7 +464,7 @@ class _KQueue(object):
                 events[fd] = events.get(fd, 0) | IOLoop.WRITE
             if kevent.flags & select.KQ_EV_ERROR:
                 events[fd] = events.get(fd, 0) | IOLoop.ERROR
-        return events.items()
+        return list(events.items())
 
 
 class _Select(object):
@@ -499,7 +499,7 @@ class _Select(object):
             events[fd] = events.get(fd, 0) | IOLoop.WRITE
         for fd in errors:
             events[fd] = events.get(fd, 0) | IOLoop.ERROR
-        return events.items()
+        return list(events.items())
 
 
 # Choose a poll implementation. Use epoll if it is available, fall back to

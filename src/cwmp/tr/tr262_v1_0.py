@@ -14,6 +14,6 @@
 #
 """Auto-generated from spec: urn:broadband-forum-org:tr-262-1-0."""
 
-import core
+from . import core
 
 

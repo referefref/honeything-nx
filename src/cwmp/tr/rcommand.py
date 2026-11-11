@@ -22,10 +22,10 @@ __author__ = 'apenwarr@google.com (Avery Pennarun)'
 
 
 import traceback
-import core
-import download
-import mainloop
-import quotedblock
+from . import core
+from . import download
+from . import mainloop
+from . import quotedblock
 
 from src.logger.HoneythingLogging import HTLogging
 
@@ -66,7 +66,7 @@ class RemoteCommandStreamer(quotedblock.QuotedBlockStreamer):
       out = sum((list(i) for i in self._ProcessBlock(lines)), [])
     except EOFError:
       raise
-    except Exception, e:
+    except Exception as e:
       #print traceback.format_exc()
       ht.logger.error(traceback.format_exc())
       return [['ERROR', '-1', str(e)]]

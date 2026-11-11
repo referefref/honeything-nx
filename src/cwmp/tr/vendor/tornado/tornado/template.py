@@ -172,9 +172,9 @@ with ``{# ... #}``.
     Same as the python ``while`` statement.
 """
 
-from __future__ import absolute_import, division, with_statement
 
-import cStringIO
+
+import io
 import datetime
 import linecache
 import logging
@@ -236,7 +236,7 @@ class Template(object):
             "linkify": escape.linkify,
             "datetime": datetime,
             "_utf8": escape.utf8,  # for internal use
-            "_string_types": (unicode, bytes_type),
+            "_string_types": (str, bytes_type),
             # __name__ and __loader__ allow the traceback mechanism to find
             # the generated source code.
             "__name__": self.name.replace('.', '_'),
@@ -244,7 +244,7 @@ class Template(object):
         }
         namespace.update(self.namespace)
         namespace.update(kwargs)
-        exec self.compiled in namespace
+        exec(self.compiled, namespace)
         execute = namespace["_execute"]
         # Clear the traceback module's cache of source data now that
         # we've generated a new template (mainly for this module's
@@ -258,7 +258,7 @@ class Template(object):
             raise
 
     def _generate_python(self, loader, compress_whitespace):
-        buffer = cStringIO.StringIO()
+        buffer = io.StringIO()
         try:
             # named_blocks maps from names to _NamedBlock objects
             named_blocks = {}
@@ -611,7 +611,7 @@ class _CodeWriter(object):
             ancestors = ["%s:%d" % (tmpl.name, lineno)
                          for (tmpl, lineno) in self.include_stack]
             line_comment += ' (via %s)' % ', '.join(reversed(ancestors))
-        print >> self.file, "    " * indent + line + line_comment
+        print("    " * indent + line + line_comment, file=self.file)
 
 
 class _TemplateReader(object):

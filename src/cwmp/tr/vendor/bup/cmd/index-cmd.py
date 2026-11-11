@@ -8,11 +8,11 @@ class IterHelper:
     def __init__(self, l):
         self.i = iter(l)
         self.cur = None
-        self.next()
+        next(self)
 
-    def next(self):
+    def __next__(self):
         try:
-            self.cur = self.i.next()
+            self.cur = next(self.i)
         except StopIteration:
             self.cur = None
         return self.cur
@@ -76,7 +76,7 @@ def update_index(top, excluded_paths):
             if rig.cur.exists():
                 rig.cur.set_deleted()
                 rig.cur.repack()
-            rig.next()
+            next(rig)
         if rig.cur and rig.cur.name == path:    # paths that already existed
             if pst:
                 rig.cur.from_stat(pst, tstart)
@@ -87,7 +87,7 @@ def update_index(top, excluded_paths):
             if opt.fake_invalid:
                 rig.cur.invalidate()
             rig.cur.repack()
-            rig.next()
+            next(rig)
         else:  # new paths
             wi.add(path, pst, hashgen = hashgen)
     progress('Indexing: %d, done.\n' % total)
@@ -185,7 +185,7 @@ if opt['print'] or opt.status or opt.modified:
             line += ent.sha.encode('hex') + ' '
         if opt.long:
             line += "%7s %7s " % (oct(ent.mode), oct(ent.gitmode))
-        print line + (name or './')
+        print(line + (name or './'))
 
 if opt.check and (opt['print'] or opt.status or opt.modified or opt.update):
     log('check: starting final check.\n')

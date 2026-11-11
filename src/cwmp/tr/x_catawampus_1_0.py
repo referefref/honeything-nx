@@ -14,7 +14,7 @@
 #
 """Auto-generated from spec: urn:catawampus-org:x-catawampus-1-0."""
 
-import core
+from . import core
 
 
 class X_CATAWAMPUS_ORG_CATAWAMPUS_v1_0(core.Exporter):
@@ -26,4 +26,4 @@ class X_CATAWAMPUS_ORG_CATAWAMPUS_v1_0(core.Exporter):
 
 
 if __name__ == '__main__':
-  print core.DumpSchema(X_CATAWAMPUS_ORG_CATAWAMPUS_v1_0)
+  print(core.DumpSchema(X_CATAWAMPUS_ORG_CATAWAMPUS_v1_0))

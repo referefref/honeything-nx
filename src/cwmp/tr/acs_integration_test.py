@@ -25,10 +25,10 @@ import datetime
 import unittest
 import xml.etree.ElementTree as ET
 
-import google3
-import api
-import core
-import http
+from . import google3
+from . import api
+from . import core
+from . import http
 
 
 SOAPNS = '{http://schemas.xmlsoap.org/soap/envelope/}'

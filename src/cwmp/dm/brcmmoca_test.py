@@ -21,9 +21,9 @@
 __author__ = 'dgentry@google.com (Denton Gentry)'
 
 import unittest
-import google3
-import brcmmoca
-import netdev
+from . import google3
+from . import brcmmoca
+from . import netdev
 
 
 class MocaTest(unittest.TestCase):

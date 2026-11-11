@@ -22,8 +22,8 @@ __author__ = 'dgentry@google.com (Denton Gentry)'
 
 import unittest
 
-import google3
-import cwmpbool
+from . import google3
+from . import cwmpbool
 
 
 class CwmpBoolTest(unittest.TestCase):

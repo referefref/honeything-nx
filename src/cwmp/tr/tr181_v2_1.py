@@ -14,8 +14,8 @@
 #
 """Auto-generated from spec: urn:broadband-forum-org:tr-181-2-1."""
 
-import core
-from tr181_v2_0 import Device_v2_0
+from . import core
+from .tr181_v2_0 import Device_v2_0
 
 
 class Device_v2_1(Device_v2_0):
@@ -201,4 +201,4 @@ class Device_v2_1(Device_v2_0):
 
 
 if __name__ == '__main__':
-  print core.DumpSchema(Device_v2_1)
+  print(core.DumpSchema(Device_v2_1))

@@ -14,8 +14,8 @@
 #
 """Auto-generated from spec: urn:catawampus-org:x-catawampus-storage-1-0."""
 
-import core
-from tr140_v1_2 import StorageService_v1_2
+from . import core
+from .tr140_v1_2 import StorageService_v1_2
 
 
 class X_CATAWAMPUS_ORG_Storage_v1_0(StorageService_v1_2):
@@ -69,4 +69,4 @@ class X_CATAWAMPUS_ORG_Storage_v1_0(StorageService_v1_2):
 
 
 if __name__ == '__main__':
-  print core.DumpSchema(X_CATAWAMPUS_ORG_Storage_v1_0)
+  print(core.DumpSchema(X_CATAWAMPUS_ORG_Storage_v1_0))

@@ -24,8 +24,8 @@ __author__ = 'dgentry@google.com (Denton Gentry)'
 import copy
 import errno
 import os
-import xmlrpclib
-import google3
+import xmlrpc.client
+from . import google3
 import tr.core
 import tr.cwmpbool
 import tr.helpers
@@ -100,9 +100,9 @@ class GFiberTv(BASETV):
     def NickName(self, value):
       # TODO(jnewlin): Need some sanity here so the user can't enter
       # a value that hoses the file, like a carriage return or newline.
-      tmp_uni = unicode(value, 'utf-8')
-      tmp_uni = tmp_uni.replace(u'\n', u'')
-      tmp_uni = tmp_uni.replace(u'\r', u'')
+      tmp_uni = str(value, 'utf-8')
+      tmp_uni = tmp_uni.replace('\n', '')
+      tmp_uni = tmp_uni.replace('\r', '')
       self.config.nick_name = tmp_uni
 
     @property
@@ -126,7 +126,7 @@ class GFiberTv(BASETV):
     if self.config.nicknames:
       with file(NICKFILE_TMP, 'w') as f:
         serials = []
-        for nn in self.config.nicknames.itervalues():
+        for nn in self.config.nicknames.values():
           f.write('%s/nickname=%s\n' % (
               nn.SerialNumber, nn.config.nick_name.encode('unicode-escape')))
           serials.append(nn.SerialNumber)
@@ -153,7 +153,7 @@ class GFiberTv(BASETV):
     return len(self.config.nicknames)
 
   def IterProperties(self):
-    return self.config.nicknames.iteritems()
+    return iter(self.config.nicknames.items())
 
   def GetProperties(self, key):
     return self.config.nicknames[key]
@@ -233,7 +233,7 @@ class GFiberTvMailbox(BASETV.Mailbox):
 
   def __init__(self, url):
     super(GFiberTvMailbox, self).__init__()
-    self.rpcclient = xmlrpclib.ServerProxy(url)
+    self.rpcclient = xmlrpc.client.ServerProxy(url)
     self.Name = ''
     self.Node = ''
 
@@ -242,18 +242,18 @@ class GFiberTvMailbox(BASETV.Mailbox):
       return None
     try:
       return str(self.rpcclient.GetProperty(self.Name, self.Node))
-    except xmlrpclib.Fault:
+    except xmlrpc.client.Fault:
       raise IndexError('No such Property %s:%s' % (self.Node, self.Name))
-    except (xmlrpclib.ProtocolError, IOError):
+    except (xmlrpc.client.ProtocolError, IOError):
       raise IndexError(
           'Unable to access Property %s:%s' % (self.Node, self.Name))
 
   def SetValue(self, value):
     try:
       return str(self.rpcclient.SetProperty(self.Name, value, self.Node))
-    except xmlrpclib.Fault:
+    except xmlrpc.client.Fault:
       raise IndexError('No such Property %s:%s' % (self.Node, self.Name))
-    except (xmlrpclib.ProtocolError, IOError):
+    except (xmlrpc.client.ProtocolError, IOError):
       raise IndexError(
           'Unable to access Property %s:%s' % (self.Node, self.Name))
 
@@ -264,6 +264,6 @@ class GFiberTvMailbox(BASETV.Mailbox):
   def NodeList(self):
     try:
       return str(', '.join(self.rpcclient.ListNodes()))
-    except (xmlrpclib.Fault, xmlrpclib.ProtocolError, IOError), e:
-      print 'gfibertv.NodeList: %s' % e
+    except (xmlrpc.client.Fault, xmlrpc.client.ProtocolError, IOError) as e:
+      print('gfibertv.NodeList: %s' % e)
       return {}

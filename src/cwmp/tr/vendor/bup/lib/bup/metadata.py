@@ -5,7 +5,7 @@
 # This code is covered under the terms of the GNU Library General
 # Public License as described in the bup LICENSE file.
 import errno, os, sys, stat, pwd, grp, struct, re
-from cStringIO import StringIO
+from io import StringIO
 from bup import vint, xstat
 from bup.drecurse import recursive_dirlist
 from bup.helpers import add_error, mkdirp, log, is_superuser
@@ -193,11 +193,11 @@ class Metadata:
         self.owner = self.group = ''
         try:
             self.owner = pwd.getpwuid(st.st_uid)[0]
-        except KeyError, e:
+        except KeyError as e:
             add_error("no user name for id %s '%s'" % (st.st_gid, path))
         try:
             self.group = grp.getgrgid(st.st_gid)[0]
-        except KeyError, e:
+        except KeyError as e:
             add_error("no group name for id %s '%s'" % (st.st_gid, path))
 
     def _encode_common(self):
@@ -252,14 +252,14 @@ class Metadata:
         st = None
         try:
             st = xstat.lstat(path)
-        except OSError, e:
+        except OSError as e:
             if e.errno != errno.ENOENT:
                 raise
         if st:
             if stat.S_ISDIR(st.st_mode):
                 try:
                     os.rmdir(path)
-                except OSError, e:
+                except OSError as e:
                     if e.errno == errno.ENOTEMPTY:
                         msg = 'refusing to overwrite non-empty dir' + path
                         raise Exception(msg)
@@ -269,29 +269,29 @@ class Metadata:
 
         if stat.S_ISREG(self.mode):
             assert(self._recognized_file_type())
-            fd = os.open(path, os.O_CREAT|os.O_WRONLY|os.O_EXCL, 0600)
+            fd = os.open(path, os.O_CREAT|os.O_WRONLY|os.O_EXCL, 0o600)
             os.close(fd)
         elif stat.S_ISDIR(self.mode):
             assert(self._recognized_file_type())
-            os.mkdir(path, 0700)
+            os.mkdir(path, 0o700)
         elif stat.S_ISCHR(self.mode):
             assert(self._recognized_file_type())
-            os.mknod(path, 0600 | stat.S_IFCHR, self.rdev)
+            os.mknod(path, 0o600 | stat.S_IFCHR, self.rdev)
         elif stat.S_ISBLK(self.mode):
             assert(self._recognized_file_type())
-            os.mknod(path, 0600 | stat.S_IFBLK, self.rdev)
+            os.mknod(path, 0o600 | stat.S_IFBLK, self.rdev)
         elif stat.S_ISFIFO(self.mode):
             assert(self._recognized_file_type())
-            os.mknod(path, 0600 | stat.S_IFIFO)
+            os.mknod(path, 0o600 | stat.S_IFIFO)
         elif stat.S_ISSOCK(self.mode):
-            os.mknod(path, 0600 | stat.S_IFSOCK)
+            os.mknod(path, 0o600 | stat.S_IFSOCK)
         elif stat.S_ISLNK(self.mode):
             assert(self._recognized_file_type())
             if self.symlink_target and create_symlinks:
                 # on MacOS, symlink() permissions depend on umask, and there's
                 # no way to chown a symlink after creating it, so we have to
                 # be careful here!
-                oldumask = os.umask((self.mode & 0777) ^ 0777)
+                oldumask = os.umask((self.mode & 0o777) ^ 0o777)
                 try:
                     os.symlink(self.symlink_target, path)
                 finally:
@@ -308,7 +308,7 @@ class Metadata:
         if lutime and stat.S_ISLNK(self.mode):
             try:
                 lutime(path, (self.atime, self.mtime))
-            except OSError, e:
+            except OSError as e:
                 if e.errno == errno.EACCES:
                     raise ApplyError('lutime: %s' % e)
                 else:
@@ -316,7 +316,7 @@ class Metadata:
         else:
             try:
                 utime(path, (self.atime, self.mtime))
-            except OSError, e:
+            except OSError as e:
                 if e.errno == errno.EACCES:
                     raise ApplyError('utime: %s' % e)
                 else:
@@ -354,7 +354,7 @@ class Metadata:
 
         try:
             os.lchown(path, uid, gid)
-        except OSError, e:
+        except OSError as e:
             if e.errno == errno.EPERM:
                 add_error('lchown: %s' %  e)
             else:
@@ -384,7 +384,7 @@ class Metadata:
         try:
             if stat.S_ISLNK(st.st_mode):
                 self.symlink_target = os.readlink(path)
-        except OSError, e:
+        except OSError as e:
             add_error('readlink: %s', e)
 
     def _encode_symlink_target(self):
@@ -412,7 +412,7 @@ class Metadata:
                     if stat.S_ISDIR(st.st_mode):
                         acl = posix1e.ACL(filedef=path)
                         self.posix1e_acl.extend([acl, acl])
-            except EnvironmentError, e:
+            except EnvironmentError as e:
                 if e.errno != errno.EOPNOTSUPP:
                     raise
 
@@ -469,7 +469,7 @@ class Metadata:
                 attr = get_linux_file_attr(path)
                 if attr != 0:
                     self.linux_attr = attr
-            except OSError, e:
+            except OSError as e:
                 if e.errno == errno.EACCES:
                     add_error('read Linux attr: %s' % e)
                 elif e.errno == errno.ENOTTY: # Inappropriate ioctl for device.
@@ -502,7 +502,7 @@ class Metadata:
         if not xattr: return
         try:
             self.linux_xattr = xattr.get_all(path, nofollow=True)
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             if e.errno != errno.EOPNOTSUPP:
                 raise
 
@@ -538,7 +538,7 @@ class Metadata:
                         or v != xattr.get(path, k, nofollow=True):
                     try:
                         xattr.set(path, k, v, nofollow=True)
-                    except IOError, e:
+                    except IOError as e:
                         if e.errno == errno.EPERM:
                             raise ApplyError('xattr.set: %s' % e)
                         else:
@@ -547,7 +547,7 @@ class Metadata:
             for k in existing_xattrs:
                 try:
                     xattr.remove(path, k, nofollow=True)
-                except IOError, e:
+                except IOError as e:
                     if e.errno == errno.EPERM:
                         raise ApplyError('xattr.remove: %s' % e)
                     else:
@@ -628,7 +628,7 @@ class Metadata:
             self._apply_posix1e_acl_rec(path, restore_numeric_ids=num_ids)
             self._apply_linux_attr_rec(path, restore_numeric_ids=num_ids)
             self._apply_linux_xattr_rec(path, restore_numeric_ids=num_ids)
-        except ApplyError, e:
+        except ApplyError as e:
             add_error(e)
 
 
@@ -666,7 +666,7 @@ def save_tree(output_file, paths,
             m = from_path(p, statinfo=st, archive_path=safe_path,
                           save_symlinks=save_symlinks)
             if verbose:
-                print >> sys.stderr, m.path
+                print(m.path, file=sys.stderr)
             m.write(output_file, include_path=write_paths)
             os.chdir(dirlist_dir)
     finally:
@@ -686,7 +686,7 @@ def _set_up_path(meta, create_symlinks=True):
 
 
 class _ArchiveIterator:
-    def next(self):
+    def __next__(self):
         try:
             return Metadata.read(self._file)
         except EOFError:
@@ -702,15 +702,15 @@ class _ArchiveIterator:
 def display_archive(file):
     for meta in _ArchiveIterator(file):
         if verbose:
-            print meta.path # FIXME
+            print(meta.path) # FIXME
         else:
-            print meta.path
+            print(meta.path)
 
 
 def start_extract(file, create_symlinks=True):
     for meta in _ArchiveIterator(file):
         if verbose:
-            print >> sys.stderr, meta.path
+            print(meta.path, file=sys.stderr)
         xpath = _clean_up_extract_path(meta.path)
         if not xpath:
             add_error(Exception('skipping risky path "%s"' % meta.path))
@@ -730,7 +730,7 @@ def finish_extract(file, restore_numeric_ids=False):
                 all_dirs.append(meta)
             else:
                 if verbose:
-                    print >> sys.stderr, meta.path
+                    print(meta.path, file=sys.stderr)
                 meta.apply_to_path(path=xpath,
                                    restore_numeric_ids=restore_numeric_ids)
     all_dirs.sort(key = lambda x : len(x.path), reverse=True)
@@ -738,7 +738,7 @@ def finish_extract(file, restore_numeric_ids=False):
         # Don't need to check xpath -- won't be in all_dirs if not OK.
         xpath = _clean_up_extract_path(dir.path)
         if verbose:
-            print >> sys.stderr, dir.path
+            print(dir.path, file=sys.stderr)
         dir.apply_to_path(path=xpath, restore_numeric_ids=restore_numeric_ids)
 
 
@@ -753,20 +753,20 @@ def extract(file, restore_numeric_ids=False, create_symlinks=True):
         else:
             meta.path = xpath
             if verbose:
-                print >> sys.stderr, '+', meta.path
+                print('+', meta.path, file=sys.stderr)
             _set_up_path(meta, create_symlinks=create_symlinks)
             if os.path.isdir(meta.path):
                 all_dirs.append(meta)
             else:
                 if verbose:
-                    print >> sys.stderr, '=', meta.path
+                    print('=', meta.path, file=sys.stderr)
                 meta.apply_to_path(restore_numeric_ids=restore_numeric_ids)
     all_dirs.sort(key = lambda x : len(x.path), reverse=True)
     for dir in all_dirs:
         # Don't need to check xpath -- won't be in all_dirs if not OK.
         xpath = _clean_up_extract_path(dir.path)
         if verbose:
-            print >> sys.stderr, '=', xpath
+            print('=', xpath, file=sys.stderr)
         # Shouldn't have to check for risky paths here (omitted above).
         dir.apply_to_path(path=dir.path,
                           restore_numeric_ids=restore_numeric_ids)

@@ -23,7 +23,7 @@ import string
 import sys
 import xml.etree.ElementTree
 
-import google3
+from . import google3
 import bup.options
 
 
@@ -46,7 +46,7 @@ def Log(s):
 
 def AddChunk(spec, objtype, name, root):
   key = (spec, objtype, name)
-  assert not chunks.has_key(key)
+  assert key not in chunks
   chunks[key] = root
 
 
@@ -79,7 +79,7 @@ def ObjNameForPython(name):
 
 
 def Indented(prefix, s):
-  s = unicode(s)
+  s = str(s)
   s = re.sub(re.compile(r'^', re.M), prefix, s)
   s = re.sub(re.compile(r'^\s+$', re.M), '', s)
   return s
@@ -109,8 +109,8 @@ def ParseImports(into_spec, root):
       into_key = (into_spec, node.tag, into_name)
       if from_key in IMPORT_BUG_FIXES:
         from_key = IMPORT_BUG_FIXES[from_key]
-      assert not chunks.has_key(into_key)
-      assert not imports.has_key(into_key)
+      assert into_key not in chunks
+      assert into_key not in imports
       imports[into_key] = from_key
     elif node.tag == 'dataType':
       continue
@@ -425,7 +425,7 @@ def main():
 
   Log('Finished models.')
 
-  for spec in specs.values():
+  for spec in list(specs.values()):
     spec.MakeObjects()
   for specname, spec in sorted(specs.items()):
     pyspec = SpecNameForPython(specname)

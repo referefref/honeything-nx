@@ -25,9 +25,9 @@ import stat
 import tempfile
 import unittest
 
-import google3
-import brcmwifi
-import netdev
+from . import google3
+from . import brcmwifi
+from . import netdev
 
 
 class BrcmWifiTest(unittest.TestCase):
@@ -613,7 +613,7 @@ class BrcmWifiTest(unittest.TestCase):
     self.assertTrue(self.RmFromList(outlist, 'addwep 1 password2'))
     self.assertTrue(self.RmFromList(outlist, 'addwep 2 password3'))
     self.assertTrue(self.RmFromList(outlist, 'addwep 3 password4'))
-    print outlist
+    print(outlist)
     self.assertFalse(outlist)
 
   def testPreSharedKey(self):
@@ -662,7 +662,7 @@ class BrcmWifiTest(unittest.TestCase):
             'a0:b0:c0:00:00:02': False,
             'a0:b0:c0:00:00:03': True}
     seen = set()
-    for ad in bw.AssociatedDeviceList.values():
+    for ad in list(bw.AssociatedDeviceList.values()):
       ad.ValidateExports()
       mac = ad.AssociatedDeviceMACAddress.lower()
       self.assertEqual(ad.LastDataTransmitRate, speeds[mac])

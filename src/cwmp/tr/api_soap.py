@@ -21,12 +21,12 @@ import datetime
 import time
 import traceback
 
-import google3
-import api
-import core
-import cwmpbool
-import cwmpdate
-import soap
+from . import google3
+from . import api
+from . import core
+from . import cwmpbool
+from . import cwmpdate
+from . import soap
 
 from src.logger.HoneythingLogging import HTLogging
 

@@ -8,7 +8,7 @@ __author__ = 'dgentry@google.com (Denton Gentry)'
 import abc
 
 
-class PlatformConfigMeta(object):
+class PlatformConfigMeta(object, metaclass=abc.ABCMeta):
   """Class to provide platform-specific information like directory locations.
 
   Each platform is expected to subclass PlatformMeta and supply concrete
@@ -18,7 +18,6 @@ class PlatformConfigMeta(object):
   (because they will fail to startup when their PlatformMeta fails to
   instantiate).
   """
-  __metaclass__ = abc.ABCMeta
 
   @abc.abstractmethod
   def ConfigDir(self):

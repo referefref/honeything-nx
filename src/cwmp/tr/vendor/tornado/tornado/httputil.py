@@ -16,10 +16,10 @@
 
 """HTTP utility code shared by clients and servers."""
 
-from __future__ import absolute_import, division, with_statement
+
 
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import re
 
 from tornado.util import b, ObjectDict
@@ -91,7 +91,7 @@ class HTTPHeaders(dict):
         If a header has multiple values, multiple pairs will be
         returned with the same name.
         """
-        for name, list in self._as_list.iteritems():
+        for name, list in self._as_list.items():
             for value in list:
                 yield (name, value)
 
@@ -151,7 +151,7 @@ class HTTPHeaders(dict):
 
     def update(self, *args, **kwargs):
         # dict.update bypasses our __setitem__
-        for k, v in dict(*args, **kwargs).iteritems():
+        for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
     def copy(self):
@@ -190,7 +190,7 @@ def url_concat(url, args):
         return url
     if url[-1] not in ('?', '&'):
         url += '&' if ('?' in url) else '?'
-    return url + urllib.urlencode(args)
+    return url + urllib.parse.urlencode(args)
 
 
 class HTTPFile(ObjectDict):
@@ -274,7 +274,7 @@ def _parse_header(line):
 
     """
     parts = _parseparam(';' + line)
-    key = parts.next()
+    key = next(parts)
     pdict = {}
     for p in parts:
         i = p.find('=')

@@ -27,10 +27,10 @@ import datetime
 import errno
 import os
 import socket
-import google3
+from . import google3
 import tornado.ioloop
 import tornado.iostream  #pylint: disable-msg=W0404
-import helpers
+from . import helpers
 
 from src.logger.HoneythingLogging import HTLogging
 
@@ -41,7 +41,7 @@ def _DeleteOldSock(family, address):
   tsock = socket.socket(family, socket.SOCK_STREAM, 0)
   try:
     tsock.connect(address)
-  except socket.error, e:
+  except socket.error as e:
     if e.errno == errno.ECONNREFUSED:
       helpers.Unlink(address)
 
@@ -98,7 +98,7 @@ class ListenSocket(object):
   def _Accept(self, fd, events):  #pylint: disable-msg=W0613
     try:
       sock, address = self.sock.accept()
-    except socket.error, e:
+    except socket.error as e:
       if e.args[0] in (errno.EWOULDBLOCK, errno.EAGAIN):
         return
       raise
@@ -171,7 +171,7 @@ class MainLoop(object):
     # called
     if self.ioloop:
       #gpylint: disable-msg=W0212
-      for fd in self.ioloop._handlers.keys():
+      for fd in list(self.ioloop._handlers.keys()):
         self.ioloop.remove_handler(fd)
       self.ioloop._handlers.clear()
       self.ioloop._events.clear()

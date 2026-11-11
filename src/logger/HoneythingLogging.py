@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from BaseLogging import BaseLogging
+from .BaseLogging import BaseLogging
 
 
 class HTLogging(BaseLogging):

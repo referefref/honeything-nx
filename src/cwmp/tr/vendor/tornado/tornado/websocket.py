@@ -17,7 +17,7 @@ communication between the browser and server.
    documentation for caveats).
 """
 
-from __future__ import absolute_import, division, with_statement
+
 # Author: Jacob Kristhammar, 2010
 
 import array
@@ -106,7 +106,7 @@ class WebSocketHandler(tornado.web.RequestHandler):
         # Connection header should be upgrade. Some proxy servers/load balancers
         # might mess with it.
         headers = self.request.headers
-        connection = map(lambda s: s.strip().lower(), headers.get("Connection", "").split(","))
+        connection = [s.strip().lower() for s in headers.get("Connection", "").split(",")]
         if 'upgrade' not in connection:
             self.stream.write(tornado.escape.utf8(
                 "HTTP/1.1 400 Bad Request\r\n\r\n"
@@ -364,7 +364,7 @@ class WebSocketProtocol76(WebSocketProtocol):
         """
         fields = ("Origin", "Host", "Sec-Websocket-Key1",
                   "Sec-Websocket-Key2")
-        if not all(map(lambda f: self.request.headers.get(f), fields)):
+        if not all([self.request.headers.get(f) for f in fields]):
             raise ValueError("Missing/Invalid WebSocket headers")
 
     def _calculate_part(self, key):
@@ -417,7 +417,7 @@ class WebSocketProtocol76(WebSocketProtocol):
         if binary:
             raise ValueError(
                 "Binary messages not supported by this version of websockets")
-        if isinstance(message, unicode):
+        if isinstance(message, str):
             message = message.encode("utf-8")
         assert isinstance(message, bytes_type)
         self.stream.write(b("\x00") + message + b("\xff"))
@@ -470,7 +470,7 @@ class WebSocketProtocol13(WebSocketProtocol):
         raised
         """
         fields = ("Host", "Sec-Websocket-Key", "Sec-Websocket-Version")
-        if not all(map(lambda f: self.request.headers.get(f), fields)):
+        if not all([self.request.headers.get(f) for f in fields]):
             raise ValueError("Missing/Invalid WebSocket headers")
 
     def _challenge_response(self):
@@ -571,7 +571,7 @@ class WebSocketProtocol13(WebSocketProtocol):
 
     def _on_frame_data(self, data):
         unmasked = array.array("B", data)
-        for i in xrange(len(data)):
+        for i in range(len(data)):
             unmasked[i] = unmasked[i] ^ self._frame_mask[i % 4]
 
         if self._frame_opcode_is_control:

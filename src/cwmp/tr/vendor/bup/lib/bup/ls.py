@@ -1,7 +1,7 @@
 """Common code for listing files from a bup repository."""
 import stat
 from bup import options, vfs
-from helpers import *
+from .helpers import *
 
 
 def node_name(text, n, show_hash):
@@ -51,13 +51,13 @@ def do_ls(args, pwd, default='.', onabort=None, spec_prefix=''):
                         if istty1:
                             L.append(node_name(name, sub, opt.hash))
                         else:
-                            print node_name(name, sub, opt.hash)
+                            print(node_name(name, sub, opt.hash))
             else:
                 if istty1:
                     L.append(node_name(path, n, opt.hash))
                 else:
-                    print node_name(path, n, opt.hash)
-        except vfs.NodeError, e:
+                    print(node_name(path, n, opt.hash))
+        except vfs.NodeError as e:
             log('error: %s\n' % e)
             ret = 1
 

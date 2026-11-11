@@ -11,16 +11,16 @@ top_dir = os.getcwd()
 def ex(*cmd):
     try:
         cmd_str = ' '.join(cmd)
-        print >> sys.stderr, cmd_str
+        print(cmd_str, file=sys.stderr)
         rc = subprocess.call(cmd)
         if rc < 0:
-            print >> sys.stderr, 'terminated by signal', - rc
+            print('terminated by signal', - rc, file=sys.stderr)
             sys.exit(1)
         elif rc > 0:
-            print >> sys.stderr, 'returned exit status', rc
+            print('returned exit status', rc, file=sys.stderr)
             sys.exit(1)
-    except OSError, e:
-        print >> sys.stderr, 'subprocess call failed:', e
+    except OSError as e:
+        print('subprocess call failed:', e, file=sys.stderr)
         sys.exit(1)
 
 
@@ -34,7 +34,7 @@ def setup_testfs():
     ex('mount', '-o', 'loop,acl,user_xattr', 'testfs.img', 'testfs')
     # Hide, so that tests can't create risks.
     os.chown('testfs', 0, 0)
-    os.chmod('testfs', 0700)
+    os.chmod('testfs', 0o700)
 
 
 def cleanup_testfs():

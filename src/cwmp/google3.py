@@ -23,4 +23,4 @@ come before other non-python-standard imports.
 __author__ = 'apenwarr@google.com (Avery Pennarun)'
 
 
-import tr.google3  #pylint: disable-msg=C6204,W0611
+from . import tr.google3  #pylint: disable-msg=C6204,W0611

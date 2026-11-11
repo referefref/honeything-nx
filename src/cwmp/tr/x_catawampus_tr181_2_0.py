@@ -14,8 +14,8 @@
 #
 """Auto-generated from spec: urn:catawampus-org:x-catawampus-tr181-2-0."""
 
-import core
-from tr181_v2_4 import Device_v2_4
+from . import core
+from .tr181_v2_4 import Device_v2_4
 
 
 class X_CATAWAMPUS_ORG_Device_v2_0(Device_v2_4):
@@ -84,4 +84,4 @@ class X_CATAWAMPUS_ORG_Device_v2_0(Device_v2_4):
 
 
 if __name__ == '__main__':
-  print core.DumpSchema(X_CATAWAMPUS_ORG_Device_v2_0)
+  print(core.DumpSchema(X_CATAWAMPUS_ORG_Device_v2_0))

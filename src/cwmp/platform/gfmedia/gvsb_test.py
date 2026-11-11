@@ -25,8 +25,8 @@ import shutil
 import tempfile
 import unittest
 
-import google3
-import gvsb
+from . import google3
+from . import gvsb
 
 
 class GvsbTest(unittest.TestCase):

@@ -28,12 +28,12 @@ import random
 import re
 import socket
 import time
-import urlparse
+import urllib.parse
 
-import google3
+from . import google3
 import tornado.ioloop
-import cwmpbool
-import cwmpdate
+from . import cwmpbool
+from . import cwmpdate
 
 
 # Allow unit tests to override with a mock
@@ -110,7 +110,7 @@ class CpeManagementServer(object):
       return
 
     # Require https for the url scheme.
-    split_url = urlparse.urlsplit(value)
+    split_url = urllib.parse.urlsplit(value)
     if split_url.scheme != 'https':
       raise ValueError('The ACS Host must be https: %s' % str(value))
 

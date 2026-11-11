@@ -24,8 +24,8 @@ import datetime
 import unittest
 import xml.etree.ElementTree as ET
 
-import google3
-import api_soap
+from . import google3
+from . import api_soap
 
 
 expectedTransferComplete = """<?xml version="1.0" encoding="utf-8"?>
@@ -55,8 +55,8 @@ class RpcMessageTest(unittest.TestCase):
 
   def testTransferComplete(self):
     encode = api_soap.Encode()
-    start = datetime.datetime(2011, 12, 5, 12, 01, 02)
-    end = datetime.datetime(2011, 12, 5, 12, 01, 03)
+    start = datetime.datetime(2011, 12, 5, 12, 0o1, 0o2)
+    end = datetime.datetime(2011, 12, 5, 12, 0o1, 0o3)
     xml = str(encode.TransferComplete('cmdkey', 123, 'faultstring', start, end))
 
     root = ET.fromstring(str(xml))

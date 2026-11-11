@@ -21,7 +21,7 @@
 __author__ = 'apenwarr@google.com (Avery Pennarun)'
 
 import unittest
-import core
+from . import core
 
 
 class TestObject(core.Exporter):
@@ -58,8 +58,8 @@ class CoreTest(unittest.TestCase):
     o.AddExportObject('Counter')
     o.AddExportObject('Counter')
     o.AddExportObject('Counter')
-    print o.ListExports(recursive=False)
-    print o.ListExports(recursive=True)
+    print(o.ListExports(recursive=False))
+    print(o.ListExports(recursive=True))
     self.assertEqual(list(o.ListExports()),
                      ['Counter.', 'SubObj.', 'TestParam'])
     self.assertEqual(list(o.ListExports(recursive=True)),
@@ -79,14 +79,14 @@ class CoreTest(unittest.TestCase):
                       'Counter.0.', 'Counter.0.Count',
                       'Counter.2.', 'Counter.2.Count',
                       'SubObj.', 'SubObj.Count', 'TestParam'])
-    self.assertEqual([(idx, i.Count) for idx, i in o.CounterList.items()],
+    self.assertEqual([(idx, i.Count) for idx, i in list(o.CounterList.items())],
                      [(0, 2), (2, 4)])
     idx, eo = o.AddExportObject('Counter', 'fred')
     eo.Count = 99
-    print o.ListExports(recursive=True)
-    self.assertEqual([(idx, i.Count) for idx, i in o.CounterList.items()],
+    print(o.ListExports(recursive=True))
+    self.assertEqual([(idx, i.Count) for idx, i in list(o.CounterList.items())],
                      [(0, 2), (2, 4), ('fred', 99)])
-    print core.Dump(o)
+    print(core.Dump(o))
     o.ValidateExports()
 
   def testCanonicalName(self):

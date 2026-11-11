@@ -74,7 +74,7 @@ if len(argv) < 2:
 try:
     optspec = ['help', 'version', 'debug', 'profile', 'bup-dir=']
     global_args, subcmd = getopt.getopt(argv[1:], '?VDd:', optspec)
-except getopt.GetoptError, ex:
+except getopt.GetoptError as ex:
     usage('error: %s' % ex.msg)
 
 help_requested = None
@@ -180,11 +180,11 @@ try:
             try:
                 ret = p.wait()
                 break
-            except SigException, e:
+            except SigException as e:
                 log('\nbup: %s\n' % e)
                 os.kill(p.pid, e.signum)
                 ret = 94
-    except OSError, e:
+    except OSError as e:
         log('%s: %s\n' % (subcmd[0], e))
         ret = 98
 finally:

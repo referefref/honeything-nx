@@ -8,6 +8,7 @@ import bup._helpers as _helpers
 # This function should really be in helpers, not in bup.options.  But we
 # want options.py to be standalone so people can include it in other projects.
 from bup.options import _tty_width
+from functools import reduce
 tty_width = _tty_width
 
 
@@ -41,7 +42,7 @@ def _hard_write(fd, buf):
             raise IOError('select(fd) returned without being writable')
         try:
             sz = os.write(fd, buf)
-        except OSError, e:
+        except OSError as e:
             if e.errno != errno.EAGAIN:
                 raise
         assert(sz >= 0)
@@ -111,7 +112,7 @@ def mkdirp(d, mode=None):
             os.makedirs(d, mode)
         else:
             os.makedirs(d)
-    except OSError, e:
+    except OSError as e:
         if e.errno == errno.EEXIST:
             pass
         else:
@@ -121,7 +122,7 @@ def mkdirp(d, mode=None):
 def next(it):
     """Get the next item from an iterator, None if we reached the end."""
     try:
-        return it.next()
+        return it.__next__()
     except StopIteration:
         return None
 
@@ -148,7 +149,7 @@ def merge_iter(iters, pfreq, pfunc, pfinal, key=None):
             yield e
         count += 1
         try:
-            e = it.next() # Don't use next() function, it's too expensive
+            e = it.__next__() # Don't use next() function, it's too expensive
         except StopIteration:
             heapq.heappop(heap) # remove current
         else:
@@ -164,7 +165,7 @@ def unlink(f):
     """
     try:
         os.unlink(f)
-    except OSError, e:
+    except OSError as e:
         if e.errno == errno.ENOENT:
             pass  # it doesn't exist, that's what you asked for
 
@@ -420,7 +421,7 @@ class DemuxConn(BaseConn):
                 if not self._next_packet(timeout):
                     return False
             try:
-                self.buf = self.reader.next()
+                self.buf = self.reader.__next__()
                 return True
             except StopIteration:
                 self.reader = None
@@ -637,7 +638,7 @@ def parse_date_or_fatal(str, fatal):
     For now we expect a string that contains a float."""
     try:
         date = atof(str)
-    except ValueError, e:
+    except ValueError as e:
         raise fatal('invalid date format (should be a float): %r' % e)
     else:
         return date

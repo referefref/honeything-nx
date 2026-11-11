@@ -138,7 +138,7 @@ class cache(object):
   @staticmethod
   def flush():
     """Flush all cached data."""
-    for k in cache._thecache.keys():
+    for k in list(cache._thecache.keys()):
       del cache._thecache[k]
 
   def __init__(self, func):

@@ -20,7 +20,7 @@ __author__ = 'apenwarr@google.com (Avery Pennarun)'
 
 import re
 import xml.etree.ElementTree
-import google3
+from . import google3
 import xmlwitch
 
 from src.logger.HoneythingLogging import HTLogging
@@ -80,11 +80,11 @@ class _Enterable(object):
     return self.iter
 
   def __enter__(self):
-    return self.iter.next()
+    return next(self.iter)
 
   def __exit__(self, type, value, tb):
     try:
-      self.iter.next()
+      next(self.iter)
     except StopIteration:
       pass
 
@@ -169,7 +169,7 @@ class NodeWrapper(object):
       return self._list[key]
     try:
       return self._dict[key]
-    except KeyError, e:
+    except KeyError as e:
       try:
         idx = int(key)
       except ValueError:
@@ -191,7 +191,7 @@ class NodeWrapper(object):
     return self._Get(key)
 
   def iteritems(self):
-    return self._dict.iteritems()
+    return iter(self._dict.items())
 
   def __str__(self):
     out = []

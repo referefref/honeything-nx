@@ -28,8 +28,8 @@ if __name__ != "__main__":   # we're imported as a module
         filename = os.path.basename(filename)
         msg = re.sub(r'\s+', ' ', str(msg))
         sys.stderr.flush()
-        print '! %-70s %s' % ('%s:%-4d %s' % (filename, line, msg),
-                              code)
+        print('! %-70s %s' % ('%s:%-4d %s' % (filename, line, msg),
+                              code))
         sys.stdout.flush()
 
 
@@ -88,7 +88,7 @@ if __name__ != "__main__":   # we're imported as a module
         '''
         try:
             func(*args, **kwargs)
-        except etype, e:
+        except etype as e:
             return _check(True, 'EXCEPT(%s)' % _code())
         except:
             _check(False, 'EXCEPT(%s)' % _code())
@@ -116,25 +116,25 @@ else:  # we're the main program
     import wvtest
 
     def _runtest(modname, fname, f):
-        print
-        print 'Testing "%s" in %s.py:' % (fname, modname)
+        print()
+        print('Testing "%s" in %s.py:' % (fname, modname))
         sys.stdout.flush()
         try:
             f()
-        except Exception, e:
-            print
-            print traceback.format_exc()
+        except Exception as e:
+            print()
+            print(traceback.format_exc())
             tb = sys.exc_info()[2]
             wvtest._result(e, traceback.extract_tb(tb)[1], 'EXCEPTION')
 
     # main code
     for modname in sys.argv[1:]:
         if not os.path.exists(modname):
-            print 'Skipping: %s' % modname
+            print('Skipping: %s' % modname)
             continue
         if modname.endswith('.py'):
             modname = modname[:-3]
-        print 'Importing: %s' % modname
+        print('Importing: %s' % modname)
         wvtest._registered = []
         oldwd = os.getcwd()
         oldpath = sys.path
@@ -144,11 +144,11 @@ else:  # we're the main program
             sys.path += [path, os.path.split(path)[0]]
             mod = __import__(modname.replace(os.path.sep, '.'), None, None, [])
             for t in wvtest._registered:
-                _runtest(modname, t.func_name, t)
-                print
+                _runtest(modname, t.__name__, t)
+                print()
         finally:
             os.chdir(oldwd)
             sys.path = oldpath
 
-    print
-    print 'WvTest: %d tests, %d failures.' % (wvtest._tests, wvtest._fails)
+    print()
+    print('WvTest: %d tests, %d failures.' % (wvtest._tests, wvtest._fails))

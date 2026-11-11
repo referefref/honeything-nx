@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-from __future__ import absolute_import, division, with_statement
+
 import logging
 import os
 import signal
@@ -60,7 +60,7 @@ class ProcessTest(LogTrapTestCase):
         signal.alarm(5)
         try:
             id = fork_processes(3, max_restarts=3)
-        except SystemExit, e:
+        except SystemExit as e:
             # if we exit cleanly from fork_processes, all the child processes
             # finished with status 0
             self.assertEqual(e.code, 0)
@@ -87,7 +87,7 @@ class ProcessTest(LogTrapTestCase):
                 def fetch(url, fail_ok=False):
                     try:
                         return client.fetch(get_url(url))
-                    except HTTPError, e:
+                    except HTTPError as e:
                         if not (fail_ok and e.code == 599):
                             raise
 

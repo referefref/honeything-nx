@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import with_statement
+
 
 import contextlib
 import errno
@@ -10,7 +10,7 @@ import socket
 import subprocess
 import sys
 import time
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 if __name__ == "__main__":
     tornado_root = os.path.abspath(os.path.join(os.path.dirname(__file__),
@@ -27,7 +27,7 @@ if __name__ == "__main__":
                             cwd=tornado_root)
             
     try:
-        for i in xrange(50):
+        for i in range(50):
             with contextlib.closing(socket.socket()) as sock:
                 err = sock.connect_ex(('localhost', port))
                 if err == 0:
@@ -38,8 +38,8 @@ if __name__ == "__main__":
         else:
             raise Exception("Server didn't start listening")
 
-        resp = urllib2.urlopen("http://localhost:%d/" % port)
-        print resp.read()
+        resp = urllib.request.urlopen("http://localhost:%d/" % port)
+        print(resp.read())
     finally:
         # dev_appserver sometimes ignores SIGTERM (especially on 2.5),
         # so try a few times to kill it.

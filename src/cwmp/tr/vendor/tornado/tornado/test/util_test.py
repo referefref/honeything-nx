@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, with_statement
+
 import sys
 import unittest
 
@@ -22,5 +22,5 @@ class RaiseExcInfoTest(unittest.TestCase):
         try:
             raise_exc_info(exc_info)
             self.fail("didn't get expected exception")
-        except TwoArgException, e:
+        except TwoArgException as e:
             self.assertTrue(e is exc_info[1])

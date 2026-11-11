@@ -21,10 +21,10 @@
 
 __author__ = 'dgentry@google.com (Denton Gentry)'
 
-import google3
-import dm.catawampus
-import dm.management_server
-import tr.core
+from . import google3
+from . import dm.catawampus
+from . import dm.management_server
+from . import tr.core
 
 
 def _RecursiveImport(name):

@@ -23,8 +23,8 @@ __author__ = 'dgentry@google.com (Denton Gentry)'
 import collections
 import unittest
 
-import google3
-import storage
+from . import google3
+from . import storage
 
 
 statvfsstruct = collections.namedtuple(
@@ -114,7 +114,7 @@ class StorageTest(unittest.TestCase):
                   '/foo': 'X_CATAWAMPUS-ORG_ubifs',
                   '/tmp': 'X_CATAWAMPUS-ORG_tmpfs'}
     expectedRo = {'/': False, '/foo': True, '/tmp': False}
-    for vol in volumes.values():
+    for vol in list(volumes.values()):
       t = OsStatVfs(vol.Name)
       self.assertEqual(vol.Status, 'Online')
       self.assertTrue(vol.Enable)

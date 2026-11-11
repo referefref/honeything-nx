@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, with_statement
+
 from tornado import gen
 from tornado.escape import json_decode, utf8, to_unicode, recursive_unicode, native_str
 from tornado.iostream import IOStream
@@ -85,7 +85,7 @@ class CookieTest(AsyncHTTPTestCase, LogTrapTestCase):
                 # Try setting cookies with different argument types
                 # to ensure that everything gets encoded correctly
                 self.set_cookie("str", "asdf")
-                self.set_cookie("unicode", u"qwer")
+                self.set_cookie("unicode", "qwer")
                 self.set_cookie("bytes", b("zxcv"))
 
         class GetCookieHandler(RequestHandler):
@@ -96,8 +96,8 @@ class CookieTest(AsyncHTTPTestCase, LogTrapTestCase):
             def get(self):
                 # unicode domain and path arguments shouldn't break things
                 # either (see bug #285)
-                self.set_cookie("unicode_args", "blah", domain=u"foo.com",
-                                path=u"/foo")
+                self.set_cookie("unicode_args", "blah", domain="foo.com",
+                                path="/foo")
 
         class SetCookieSpecialCharHandler(RequestHandler):
             def get(self):
@@ -254,9 +254,9 @@ class EchoHandler(RequestHandler):
             for value in self.request.arguments[key]:
                 assert type(value) == bytes_type, repr(value)
             for value in self.get_arguments(key):
-                assert type(value) == unicode, repr(value)
+                assert type(value) == str, repr(value)
         for arg in path_args:
-            assert type(arg) == unicode, repr(arg)
+            assert type(arg) == str, repr(arg)
         self.write(dict(path=self.request.path,
                         path_args=path_args,
                         args=recursive_unicode(self.request.arguments)))
@@ -282,9 +282,9 @@ class RequestEncodingTest(AsyncHTTPTestCase, LogTrapTestCase):
     def test_group_encoding(self):
         # Path components and query arguments should be decoded the same way
         self.assertEqual(self.fetch_json('/group/%C3%A9?arg=%C3%A9'),
-                         {u"path": u"/group/%C3%A9",
-                          u"path_args": [u"\u00e9"],
-                          u"args": {u"arg": [u"\u00e9"]}})
+                         {"path": "/group/%C3%A9",
+                          "path_args": ["\u00e9"],
+                          "args": {"arg": ["\u00e9"]}})
 
     def test_slashes(self):
         # Slashes may be escaped to appear as a single "directory" in the path,
@@ -307,13 +307,13 @@ class TypeCheckHandler(RequestHandler):
 
         # get_argument is an exception from the general rule of using
         # type str for non-body data mainly for historical reasons.
-        self.check_type('argument', self.get_argument('foo'), unicode)
-        self.check_type('cookie_key', self.cookies.keys()[0], str)
-        self.check_type('cookie_value', self.cookies.values()[0].value, str)
+        self.check_type('argument', self.get_argument('foo'), str)
+        self.check_type('cookie_key', list(self.cookies.keys())[0], str)
+        self.check_type('cookie_value', list(self.cookies.values())[0].value, str)
 
         # Secure cookies return bytes because they can contain arbitrary
         # data, but regular cookies are native strings.
-        assert self.cookies.keys() == ['asdf']
+        assert list(self.cookies.keys()) == ['asdf']
         self.check_type('get_secure_cookie', self.get_secure_cookie('asdf'), bytes_type)
         self.check_type('get_cookie', self.get_cookie('asdf'), str)
 
@@ -327,11 +327,11 @@ class TypeCheckHandler(RequestHandler):
     def get(self, path_component):
         # path_component uses type unicode instead of str for consistency
         # with get_argument()
-        self.check_type('path_component', path_component, unicode)
+        self.check_type('path_component', path_component, str)
         self.write(self.errors)
 
     def post(self, path_component):
-        self.check_type('path_component', path_component, unicode)
+        self.check_type('path_component', path_component, str)
         self.write(self.errors)
 
     def check_type(self, name, obj, expected_type):
@@ -354,7 +354,7 @@ class DecodeArgHandler(RequestHandler):
         def describe(s):
             if type(s) == bytes_type:
                 return ["bytes", native_str(binascii.b2a_hex(s))]
-            elif type(s) == unicode:
+            elif type(s) == str:
                 return ["unicode", s]
             raise Exception("unknown type")
         self.write({'path': describe(arg),
@@ -431,7 +431,7 @@ class HeaderInjectionHandler(RequestHandler):
         try:
             self.set_header("X-Foo", "foo\r\nX-Bar: baz")
             raise Exception("Didn't get expected exception")
-        except ValueError, e:
+        except ValueError as e:
             assert "Unsafe header value" in str(e)
             self.finish(b("ok"))
 
@@ -498,15 +498,15 @@ class WebTest(AsyncHTTPTestCase, LogTrapTestCase):
             response = self.fetch(url)
             response.rethrow()
             data = json_decode(response.body)
-            self.assertEqual(data, {u'path': [u'unicode', u'\u00e9'],
-                                    u'query': [u'unicode', u'\u00e9'],
+            self.assertEqual(data, {'path': ['unicode', '\u00e9'],
+                                    'query': ['unicode', '\u00e9'],
                                     })
 
         response = self.fetch("/decode_arg/%C3%A9?foo=%C3%A9")
         response.rethrow()
         data = json_decode(response.body)
-        self.assertEqual(data, {u'path': [u'bytes', u'c3a9'],
-                                u'query': [u'bytes', u'c3a9'],
+        self.assertEqual(data, {'path': ['bytes', 'c3a9'],
+                                'query': ['bytes', 'c3a9'],
                                 })
 
     def test_reverse_url(self):
@@ -516,7 +516,7 @@ class WebTest(AsyncHTTPTestCase, LogTrapTestCase):
                          '/decode_arg/42')
         self.assertEqual(self.app.reverse_url('decode_arg', b('\xe9')),
                          '/decode_arg/%E9')
-        self.assertEqual(self.app.reverse_url('decode_arg', u'\u00e9'),
+        self.assertEqual(self.app.reverse_url('decode_arg', '\u00e9'),
                          '/decode_arg/%C3%A9')
 
     def test_uimodule_unescaped(self):
@@ -551,9 +551,9 @@ js_embed()
 
     def test_optional_path(self):
         self.assertEqual(self.fetch_json("/optional_path/foo"),
-                         {u"path": u"foo"})
+                         {"path": "foo"})
         self.assertEqual(self.fetch_json("/optional_path/"),
-                         {u"path": None})
+                         {"path": None})
 
     def test_flow_control(self):
         self.assertEqual(self.fetch("/flow_control").body, b("123"))
@@ -782,7 +782,7 @@ class NamedURLSpecGroupsTest(AsyncHTTPTestCase, LogTrapTestCase):
                 self.write(path)
 
         return Application([("/str/(?P<path>.*)", EchoHandler),
-                            (u"/unicode/(?P<path>.*)", EchoHandler)])
+                            ("/unicode/(?P<path>.*)", EchoHandler)])
 
     def test_named_urlspec_groups(self):
         response = self.fetch("/str/foo")

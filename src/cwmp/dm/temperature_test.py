@@ -24,9 +24,9 @@ import datetime
 import os
 import unittest
 
-import google3
+from . import google3
 import tr.core
-import temperature
+from . import temperature
 
 
 TR181_BAD_TEMPERATURE = -274

@@ -5,17 +5,18 @@ from bup import _helpers
 
 try:
     _have_bup_utime_ns = _helpers.bup_utime_ns
-except AttributeError, e:
+except AttributeError as e:
     _have_bup_utime_ns = False
 
 try:
     _have_bup_lutime_ns = _helpers.bup_lutime_ns
-except AttributeError, e:
+except AttributeError as e:
     _have_bup_lutime_ns = False
 
 
-def timespec_to_nsecs((ts_s, ts_ns)):
+def timespec_to_nsecs(xxx_todo_changeme):
     # c.f. _helpers.c: timespec_vals_to_py_ns()
+    (ts_s, ts_ns) = xxx_todo_changeme
     if ts_ns < 0 or ts_ns > 999999999:
         raise Exception('invalid timespec nsec value')
     return ts_s * 10**9 + ts_ns

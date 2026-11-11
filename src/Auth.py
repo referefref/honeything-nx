@@ -18,7 +18,7 @@
 
 import hashlib
 
-from config.ConfigReader import ConfigReader
+from .config.ConfigReader import ConfigReader
 
 
 class Auth:

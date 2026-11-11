@@ -14,9 +14,9 @@
 #
 """Auto-generated from spec: urn:broadband-forum-org:tr-157-1-3."""
 
-import core
-from tr157_v1_2 import Device_v1_6
-from tr157_v1_2 import InternetGatewayDevice_v1_7
+from . import core
+from .tr157_v1_2 import Device_v1_6
+from .tr157_v1_2 import InternetGatewayDevice_v1_7
 
 
 class Device_v1_7(Device_v1_6):
@@ -400,5 +400,5 @@ class InternetGatewayDevice_v1_8(InternetGatewayDevice_v1_7):
 
 
 if __name__ == '__main__':
-  print core.DumpSchema(Device_v1_7)
-  print core.DumpSchema(InternetGatewayDevice_v1_8)
+  print(core.DumpSchema(Device_v1_7))
+  print(core.DumpSchema(InternetGatewayDevice_v1_8))

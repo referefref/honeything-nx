@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import absolute_import, division, with_statement
+
 
 import base64
 import binascii
@@ -168,7 +168,7 @@ Transfer-Encoding: chunked
                          response.body)
 
     def test_body_encoding(self):
-        unicode_body = u"\xe9"
+        unicode_body = "\xe9"
         byte_body = binascii.a2b_hex(b("e9"))
 
         # unicode string in body gets converted to utf8
@@ -188,7 +188,7 @@ Transfer-Encoding: chunked
         # break anything
         response = self.fetch("/echopost", method="POST", body=byte_body,
                               headers={"Content-Type": "application/blah"},
-                              user_agent=u"foo")
+                              user_agent="foo")
         self.assertEqual(response.headers["Content-Length"], "1")
         self.assertEqual(response.body, byte_body)
 

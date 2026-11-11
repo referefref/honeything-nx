@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, stat, urllib, mimetypes, posixpath, time
+import sys, stat, urllib.request, urllib.parse, urllib.error, mimetypes, posixpath, time
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
@@ -73,8 +73,8 @@ class BupRequestHandler(tornado.web.RequestHandler):
     
     @tornado.web.asynchronous
     def _process_request(self, path):
-        path = urllib.unquote(path)
-        print 'Handling request for %s' % path
+        path = urllib.parse.unquote(path)
+        print('Handling request for %s' % path)
         try:
             n = top.resolve(path)
         except vfs.NoSuchFile:
@@ -93,12 +93,12 @@ class BupRequestHandler(tornado.web.RequestHandler):
         error).  In either case, the headers are sent.
         """
         if not path.endswith('/') and len(path) > 0:
-            print 'Redirecting from %s to %s' % (path, path + '/')
+            print('Redirecting from %s to %s' % (path, path + '/'))
             return self.redirect(path + '/', permanent=True)
 
         try:
             show_hidden = int(self.request.arguments.get('hidden', [0])[-1])
-        except ValueError, e:
+        except ValueError as e:
             show_hidden = False
 
         self.render(
@@ -130,7 +130,7 @@ class BupRequestHandler(tornado.web.RequestHandler):
             it = chunkyreader(f)
             def write_more(me):
                 try:
-                    blob = it.next()
+                    blob = next(it)
                 except StopIteration:
                     f.close()
                     self.finish()
@@ -211,7 +211,7 @@ if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(address[1], address=address[0])
 
-    print "Serving HTTP on %s:%d..." % http_server._socket.getsockname()
+    print("Serving HTTP on %s:%d..." % http_server._socket.getsockname())
     loop = tornado.ioloop.IOLoop.instance()
     loop.start()
 

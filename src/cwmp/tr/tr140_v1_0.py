@@ -14,7 +14,7 @@
 #
 """Auto-generated from spec: urn:broadband-forum-org:tr-140-1-0."""
 
-import core
+from . import core
 
 
 class StorageService_v1_0(core.Exporter):
@@ -251,4 +251,4 @@ class StorageService_v1_0(core.Exporter):
 
 
 if __name__ == '__main__':
-  print core.DumpSchema(StorageService_v1_0)
+  print(core.DumpSchema(StorageService_v1_0))

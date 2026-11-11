@@ -25,10 +25,10 @@ import os
 import re
 import subprocess
 import sys
-import google3
-import tr.core
-import tr.mainloop
-import tr.tr181_v2_2
+from . import google3
+from . import tr.core
+from . import tr.mainloop
+from . import tr.tr181_v2_2
 
 from src.logger.HoneythingLogging import HTLogging
 
@@ -129,7 +129,7 @@ class TraceRoute(BASE_TRACEROUTE):
     self._EndProc()
     self._ClearHops()
     self.error = None
-    print 'traceroute starting.'
+    print('traceroute starting.')
     if not self.Host:
       raise Exception('TraceRoute.Host is not set')
     if ':' in self.Host:

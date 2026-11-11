@@ -86,7 +86,7 @@ class WebSocketHandler(tornado.web.RequestHandler):
         """Sends the given message to the client of this Web Socket."""
         if isinstance(message, dict):
             message = tornado.escape.json_encode(message)
-        if isinstance(message, unicode):
+        if isinstance(message, str):
             message = message.encode("utf-8")
         assert isinstance(message, str)
         self.stream.write("\x00" + message + "\xff")
@@ -116,7 +116,7 @@ class WebSocketHandler(tornado.web.RequestHandler):
         def wrapper(*args, **kwargs):
             try:
                 return callback(*args, **kwargs)
-            except Exception, e:
+            except Exception as e:
                 logging.error("Uncaught exception in %s",
                               self.request.path, exc_info=True)
                 self.stream.close()

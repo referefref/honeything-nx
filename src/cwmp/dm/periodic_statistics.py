@@ -79,7 +79,7 @@ class PeriodicStatistics(BASE157PS):
     pass
 
   def IterSampleSets(self):
-    return self.sample_sets.iteritems()
+    return iter(self.sample_sets.items())
 
   def GetSampleSet(self, key):
     return self.sample_sets[key]
@@ -136,7 +136,7 @@ class PeriodicStatistics(BASE157PS):
       self._time_reference = None
 
     def IterParameters(self):
-      return self._parameter_list.iteritems()
+      return iter(self._parameter_list.items())
 
     def GetParameter(self, key):
       return self._parameter_list[key]
@@ -197,7 +197,7 @@ class PeriodicStatistics(BASE157PS):
       self._report_samples = v
       # Trim down samples
       self._sample_times = self._sample_times[-v:]
-      for param in self._parameter_list.itervalues():
+      for param in self._parameter_list.values():
         param.TrimSamples(v)
       self.UpdateSampling()
 
@@ -242,7 +242,7 @@ class PeriodicStatistics(BASE157PS):
       """
       self._sample_times = []
       self._samples_collected = 0
-      for param in self._parameter_list.itervalues():
+      for param in self._parameter_list.values():
         param.ClearSamplingData()
 
     def UpdateSampling(self):

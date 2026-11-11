@@ -22,8 +22,8 @@ __author__ = 'dgentry@google.com (Denton Gentry)'
 
 import unittest
 
-import google3
-import wifi
+from . import google3
+from . import wifi
 
 
 class WifiTest(unittest.TestCase):

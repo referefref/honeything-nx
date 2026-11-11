@@ -76,28 +76,28 @@ metadata.verbose = opt.verbose - opt.quiet
 for path in remainder:
     try:
         m = metadata.from_path(path, archive_path = path)
-    except (OSError,IOError), e:
+    except (OSError,IOError) as e:
         if e.errno == errno.ENOENT:
             add_error(e)
             continue
         else:
             raise
     if 'path' in active_fields:
-        print 'path:', m.path
+        print('path:', m.path)
     if 'mode' in active_fields:
-        print 'mode:', oct(m.mode)
+        print('mode:', oct(m.mode))
     if 'link-target' in active_fields and stat.S_ISLNK(m.mode):
-        print 'link-target:', m.symlink_target
+        print('link-target:', m.symlink_target)
     if 'rdev' in active_fields:
-        print 'rdev:', m.rdev
+        print('rdev:', m.rdev)
     if 'uid' in active_fields:
-        print 'uid:', m.uid
+        print('uid:', m.uid)
     if 'gid' in active_fields:
-        print 'gid:', m.gid
+        print('gid:', m.gid)
     if 'owner' in active_fields:
-        print 'owner:', m.owner
+        print('owner:', m.owner)
     if 'group' in active_fields:
-        print 'group:', m.group
+        print('group:', m.group)
     if 'atime' in active_fields:
         # If we don't have utimensat, that means we have to use
         # utime(), and utime() has no way to set the mtime/atime of a
@@ -105,31 +105,31 @@ for path in remainder:
         # so let's not report it.  (That way scripts comparing
         # before/after won't trigger.)
         if xstat.lutime or not stat.S_ISLNK(m.mode):
-            print 'atime: ' + fstimestr(m.atime)
+            print('atime: ' + fstimestr(m.atime))
         else:
-            print 'atime: 0'
+            print('atime: 0')
     if 'mtime' in active_fields:
         if xstat.lutime or not stat.S_ISLNK(m.mode):
-            print 'mtime: ' + fstimestr(m.mtime)
+            print('mtime: ' + fstimestr(m.mtime))
         else:
-            print 'mtime: 0'
+            print('mtime: 0')
     if 'ctime' in active_fields:
-        print 'ctime: ' + fstimestr(m.ctime)
+        print('ctime: ' + fstimestr(m.ctime))
     if 'linux-attr' in active_fields and m.linux_attr:
-        print 'linux-attr:', hex(m.linux_attr)
+        print('linux-attr:', hex(m.linux_attr))
     if 'linux-xattr' in active_fields and m.linux_xattr:
         for name, value in m.linux_xattr:
-            print 'linux-xattr: %s -> %s' % (name, repr(value))
+            print('linux-xattr: %s -> %s' % (name, repr(value)))
     if 'posix1e-acl' in active_fields and m.posix1e_acl and metadata.posix1e:
         flags = metadata.posix1e.TEXT_ABBREVIATE
         if stat.S_ISDIR(m.mode):
             acl = m.posix1e_acl[0]
             default_acl = m.posix1e_acl[2]
-            print acl.to_any_text('posix1e-acl: ', '\n', flags)
-            print acl.to_any_text('posix1e-acl-default: ', '\n', flags)
+            print(acl.to_any_text('posix1e-acl: ', '\n', flags))
+            print(acl.to_any_text('posix1e-acl-default: ', '\n', flags))
         else:
             acl = m.posix1e_acl[0]
-            print acl.to_any_text('posix1e-acl: ', '\n', flags)
+            print(acl.to_any_text('posix1e-acl: ', '\n', flags))
 
 if saved_errors:
     log('WARNING: %d errors encountered.\n' % len(saved_errors))

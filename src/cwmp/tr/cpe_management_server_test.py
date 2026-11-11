@@ -24,9 +24,9 @@ import copy
 import datetime
 import unittest
 
-import google3
-import cpe_management_server as ms
-import cwmpdate
+from . import google3
+from . import cpe_management_server as ms
+from . import cwmpdate
 
 
 periodic_callbacks = []

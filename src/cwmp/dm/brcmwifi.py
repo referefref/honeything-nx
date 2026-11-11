@@ -37,8 +37,8 @@ import time
 import tr.core
 import tr.cwmpbool
 import tr.tr098_v1_4
-import netdev
-import wifi
+from . import netdev
+from . import wifi
 
 BASE98IGD = tr.tr098_v1_4.InternetGatewayDevice_v1_10.InternetGatewayDevice
 BASE98WIFI = BASE98IGD.LANDevice.WLANConfiguration
@@ -894,7 +894,7 @@ class BrcmWifiWlanConfiguration(BASE98WIFI):
     self.wl.SetSupWpa(sup_wpa)
     self.wl.SetWpaAuth(amode)
 
-    for idx, psk in self.PreSharedKeyList.items():
+    for idx, psk in list(self.PreSharedKeyList.items()):
       key = psk.GetKey(self.config.p_ssid)
       if key:
         self.wl.SetPMK(key)
@@ -905,7 +905,7 @@ class BrcmWifiWlanConfiguration(BASE98WIFI):
 
     # Setting WEP key has to come after setting SSID. (Doesn't make sense
     # to me, it just doesn't work if you do it before setting SSID.)
-    for idx, wep in self.WEPKeyList.items():
+    for idx, wep in list(self.WEPKeyList.items()):
       key = wep.WEPKey
       if key is None:
         self.wl.ClrWepKey(idx-1)
@@ -987,7 +987,7 @@ class BrcmWlanAssociatedDevice(BASE98WIFI.AssociatedDevice):
 
 
 def main():
-  print tr.core.DumpSchema(BrcmWifiWlanConfiguration)
+  print(tr.core.DumpSchema(BrcmWifiWlanConfiguration))
 
 if __name__ == '__main__':
   main()

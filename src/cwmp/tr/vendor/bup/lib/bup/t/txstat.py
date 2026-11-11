@@ -41,7 +41,7 @@ def test_fstime():
 
 try:
     _have_bup_utime_ns = _helpers.bup_utime_ns
-except AttributeError, e:
+except AttributeError as e:
     _have_bup_utime_ns = False
 
 @wvtest

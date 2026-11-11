@@ -245,15 +245,15 @@ class HDMI(BASE135STB.Components.HDMI):
           d = json.load(f)
           hdmiStats = d['HDMIStats']
 
-          if 'ResolutionValue' in hdmiStats.keys():
+          if 'ResolutionValue' in list(hdmiStats.keys()):
             data['ResolutionValue'] = hdmiStats['ResolutionValue']
 
       # IOError - Failed to open file or failed to read from file
       # ValueError - JSON file is malformed and cannot be decoded
       # KeyError - Decoded JSON file doesn't contain the required fields.
       except (IOError, ValueError, KeyError) as e:
-        print('HDMIStats: Failed to read stats from file {0}, '
-              'error = {1}'.format(filename, e))
+        print(('HDMIStats: Failed to read stats from file {0}, '
+              'error = {1}'.format(filename, e)))
     return data
 
   @property
@@ -290,38 +290,38 @@ class HDMIDisplayDevice(BASE135STB.Components.HDMI.DisplayDevice):
             d = json.load(f)
             displayStats = d['HDMIDisplayDevice']
 
-            if 'Status' in displayStats.keys():
+            if 'Status' in list(displayStats.keys()):
               data['Status'] = displayStats['Status']
-            if 'Name' in displayStats.keys():
+            if 'Name' in list(displayStats.keys()):
               data['Name'] = displayStats['Name']
-            if 'EEDID' in displayStats.keys():
+            if 'EEDID' in list(displayStats.keys()):
               data['EEDID'] = displayStats['EEDID']
-            if 'EDIDExtensions' in displayStats.keys():
+            if 'EDIDExtensions' in list(displayStats.keys()):
               data['EDIDExtensions'] = ', '.join(displayStats['EDIDExtensions'])
             # Supported resolutions can have duplicates! Handle it!
-            if 'SupportedResolutions' in displayStats.keys():
+            if 'SupportedResolutions' in list(displayStats.keys()):
               sup_res = set()
               for v in displayStats['SupportedResolutions']:
                 sup_res.add(v)
               data['SupportedResolutions'] = ', '.join(sorted(sup_res))
-            if 'PreferredResolution' in displayStats.keys():
+            if 'PreferredResolution' in list(displayStats.keys()):
               data['PreferredResolution'] = displayStats['PreferredResolution']
-            if 'VideoLatency' in displayStats.keys():
+            if 'VideoLatency' in list(displayStats.keys()):
               data['VideoLatency'] = displayStats['VideoLatency']
-            if 'AutoLipSyncSupport' in displayStats.keys():
+            if 'AutoLipSyncSupport' in list(displayStats.keys()):
               data['AutoLipSyncSupport'] = displayStats['AutoLipSyncSupport']
-            if 'HDMI3DPresent' in displayStats.keys():
+            if 'HDMI3DPresent' in list(displayStats.keys()):
               data['HDMI3DPresent'] = displayStats['HDMI3DPresent']
-            if 'Negotiations4hr' in displayStats.keys():
+            if 'Negotiations4hr' in list(displayStats.keys()):
               data['Negotiations4hr'] = displayStats['Negotiations4hr']
               data['LastUpdateTime'] = os.path.getmtime(filename)
-            if 'Negotiations24hr' in displayStats.keys():
+            if 'Negotiations24hr' in list(displayStats.keys()):
               data['Negotiations24hr'] = displayStats['Negotiations24hr']
-            if 'VendorId' in displayStats.keys():
+            if 'VendorId' in list(displayStats.keys()):
               data['VendorId'] = displayStats['VendorId']
-            if 'ProductId' in displayStats.keys():
+            if 'ProductId' in list(displayStats.keys()):
               data['ProductId'] = displayStats['ProductId']
-            if 'MfgYear' in displayStats.keys():
+            if 'MfgYear' in list(displayStats.keys()):
               data['MfgYear'] = displayStats['MfgYear']
 
         # IOError - Failed to open file or failed to read from file
@@ -329,8 +329,8 @@ class HDMIDisplayDevice(BASE135STB.Components.HDMI.DisplayDevice):
         # KeyError - Decoded JSON file doesn't contain the required fields.
         # OSError - mtime call failed.
         except (IOError, ValueError, KeyError, OSError) as e:
-          print('HDMIStats: Failed to read stats from file {0}, '
-                'error = {1}'.format(filename, e))
+          print(('HDMIStats: Failed to read stats from file {0}, '
+                'error = {1}'.format(filename, e)))
 
     return data
 
@@ -432,7 +432,7 @@ class ServiceMonitoring(BASE135STB.ServiceMonitoring):
     old_main_stream_stats = self._MainStreamStats
 
     # Existing stream_ids keep their instance number in self._MainStreamStats
-    for instance, old_stream in old_main_stream_stats.items():
+    for instance, old_stream in list(old_main_stream_stats.items()):
       stream_id = old_stream.stream_id
       if stream_id in streams:
         new_main_stream_stats[instance] = streams[stream_id]
@@ -441,7 +441,7 @@ class ServiceMonitoring(BASE135STB.ServiceMonitoring):
     # Remaining stream_ids claim an unused instance number in 1..num_streams
     assigned = set(new_main_stream_stats.keys())
     unassigned = set(range(1, num_streams + 1)) - assigned
-    for strm in streams.values():
+    for strm in list(streams.values()):
       instance = unassigned.pop()
       new_main_stream_stats[instance] = strm
 
@@ -468,13 +468,13 @@ class ServiceMonitoring(BASE135STB.ServiceMonitoring):
     # ValueError - JSON file is malformed and cannot be decoded
     # KeyError - Decoded JSON file doesn't contain the required fields.
     except (IOError, ValueError, KeyError) as e:
-      print('ServiceMonitoring: Failed to read stats from file {0}, '
-            'error = {1}'.format(fname, e))
+      print(('ServiceMonitoring: Failed to read stats from file {0}, '
+            'error = {1}'.format(fname, e)))
 
   def IterMainStreams(self):
     """Retrieves an iterable list of stats."""
     self.UpdateSvcMonitorStats()
-    return self._MainStreamStats.items()
+    return list(self._MainStreamStats.items())
 
   def GetMainStreamByIndex(self, index):
     """Directly access the value corresponding to a given key."""
@@ -526,11 +526,11 @@ class Total(BASE135STB.ServiceMonitoring.MainStream.Total):
     self.TCPStats = TCPStats()
 
   def UpdateTotalStats(self, data):
-    if 'DejitteringStats' in data.keys():
+    if 'DejitteringStats' in list(data.keys()):
       self.DejitteringStats.UpdateDejitteringStats(data['DejitteringStats'])
-    if 'MPEG2TSStats' in data.keys():
+    if 'MPEG2TSStats' in list(data.keys()):
       self.MPEG2TSStats.UpdateMPEG2TSStats(data['MPEG2TSStats'])
-    if 'TCPStats' in data.keys():
+    if 'TCPStats' in list(data.keys()):
       self.TCPStats.UpdateTCPStats(data['TCPStats'])
 
 
@@ -564,13 +564,13 @@ class DejitteringStats(BASE135STB.ServiceMonitoring.MainStream.Total.
     return self._session_id
 
   def UpdateDejitteringStats(self, djstats):
-    if 'EmptyBufferTime' in djstats.keys():
+    if 'EmptyBufferTime' in list(djstats.keys()):
       self._empty_buffer_time = djstats['EmptyBufferTime']
-    if 'Overruns' in djstats.keys():
+    if 'Overruns' in list(djstats.keys()):
       self._overruns = djstats['Overruns']
-    if 'Underruns' in djstats.keys():
+    if 'Underruns' in list(djstats.keys()):
       self._underruns = djstats['Underruns']
-    if 'SessionId' in djstats.keys():
+    if 'SessionId' in list(djstats.keys()):
       self._session_id = djstats['SessionId']
 
 
@@ -595,9 +595,9 @@ class MPEG2TSStats(BASE135STB.ServiceMonitoring.MainStream.Total.MPEG2TSStats):
     return self._ts_packets_received
 
   def UpdateMPEG2TSStats(self, tsstats):
-    if 'PacketsDiscontinuityCounter' in tsstats.keys():
+    if 'PacketsDiscontinuityCounter' in list(tsstats.keys()):
       self._packet_discont_counter = tsstats['PacketsDiscontinuityCounter']
-    if 'TSPacketsReceived' in tsstats.keys():
+    if 'TSPacketsReceived' in list(tsstats.keys()):
       self._ts_packets_received = tsstats['TSPacketsReceived']
 
 
@@ -624,11 +624,11 @@ class TCPStats(BASE135STB.ServiceMonitoring.MainStream.Total.TCPStats):
     return self._packets_retransmitted
 
   def UpdateTCPStats(self, tcpstats):
-    if 'Bytes Received' in tcpstats.keys():
+    if 'Bytes Received' in list(tcpstats.keys()):
       self._bytes_received = tcpstats['Bytes Received']
-    if 'Packets Received' in tcpstats.keys():
+    if 'Packets Received' in list(tcpstats.keys()):
       self._packets_received = tcpstats['Packets Received']
-    if 'Packets Retransmitted' in tcpstats.keys():
+    if 'Packets Retransmitted' in list(tcpstats.keys()):
       self._packets_retransmitted = tcpstats['Packets Retransmitted']
 
 
@@ -658,21 +658,21 @@ class EPG(BASEPROGMETADATA.X_CATAWAMPUS_ORG_ProgramMetadata.EPG):
             d = json.load(f)
             epgStats = d['EPGStats']
 
-            if 'MulticastPackets' in epgStats.keys():
+            if 'MulticastPackets' in list(epgStats.keys()):
               data['MulticastPackets'] = epgStats['MulticastPackets']
-            if 'EPGErrors' in epgStats.keys():
+            if 'EPGErrors' in list(epgStats.keys()):
               data['EPGErrors'] = epgStats['EPGErrors']
-            if 'LastReceivedTime' in epgStats.keys():
+            if 'LastReceivedTime' in list(epgStats.keys()):
               data['LastReceivedTime'] = epgStats['LastReceivedTime']
-            if'EPGExpireTime' in epgStats.keys():
+            if'EPGExpireTime' in list(epgStats.keys()):
               data['EPGExpireTime'] = epgStats['EPGExpireTime']
 
         # IOError - Failed to open file or failed to read from file
         # ValueError - JSON file is malformed and cannot be decoded
         # KeyError - Decoded JSON file doesn't contain the required fields.
         except (IOError, ValueError, KeyError) as e:
-          print('EPGStats: Failed to read stats from file {0}, '
-                'error = {1}'.format(filename, e))
+          print(('EPGStats: Failed to read stats from file {0}, '
+                'error = {1}'.format(filename, e)))
 
     return data
 

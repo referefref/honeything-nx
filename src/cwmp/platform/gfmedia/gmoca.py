@@ -23,9 +23,9 @@ __author__ = 'dgentry@google.com (Denton Gentry)'
 
 import base64
 import bz2
-import cStringIO
+import io
 import subprocess
-import google3
+from . import google3
 import tr.x_gmoca_1_0
 
 
@@ -52,7 +52,7 @@ class GMoCA(tr.x_gmoca_1_0.X_GOOGLE_COM_GMOCA_v1_0):
   @property
   def DebugOutput(self):
     compr = bz2.BZ2Compressor()
-    cdata = cStringIO.StringIO()
+    cdata = io.StringIO()
     for cmd in self.MOCACMDS:
       cdata.write(compr.compress('X_GOOGLE-COM_GMOCA --------------------\n'))
       cdata.write(compr.compress(' '.join(cmd) + '\n'))

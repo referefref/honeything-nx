@@ -66,7 +66,7 @@ Here are a few rules of thumb for when it's necessary:
   block that references your `StackContext`.
 '''
 
-from __future__ import absolute_import, division, with_statement
+
 
 import contextlib
 import functools
@@ -211,7 +211,7 @@ def wrap(fn):
         # NullContext to clear the state and then recreate from contexts.
         elif (len(_state.contexts) > len(contexts) or
             any(a[1] is not b[1]
-                for a, b in itertools.izip(_state.contexts, contexts))):
+                for a, b in zip(_state.contexts, contexts))):
             # contexts have been removed or changed, so start over
             new_contexts = ([NullContext()] +
                             [cls(arg, active_cell)

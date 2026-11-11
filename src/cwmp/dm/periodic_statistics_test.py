@@ -14,8 +14,8 @@ import mox
 import time
 import unittest
 
-import google3
-import periodic_statistics
+from . import google3
+from . import periodic_statistics
 import tornado.ioloop
 import tr.core
 import tr.http
@@ -276,7 +276,7 @@ class SampleSetTest(unittest.TestCase):
     sample_set.Enable = 'True'
     sample_set._attributes['Notification'] = 1
     sample_set.CollectSample(20)
-    print "end testPassNotify"
+    print("end testPassNotify")
 
   def testActiveNotify(self):
     sample_set = periodic_statistics.PeriodicStatistics.SampleSet()

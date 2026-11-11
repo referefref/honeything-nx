@@ -22,8 +22,8 @@ __author__ = 'dgentry@google.com (Denton Gentry)'
 
 import unittest
 
-import google3
-import stbservice
+from . import google3
+from . import stbservice
 
 
 class STBServiceTest(unittest.TestCase):
@@ -103,7 +103,7 @@ class STBServiceTest(unittest.TestCase):
     stbservice.CONT_MONITOR_FILES = self.CONT_MONITOR_FILES_ALT
     stb = stbservice.STBService()
     self.assertEqual(stb.ServiceMonitoring.MainStreamNumberOfEntries, 4)
-    for stream in stb.ServiceMonitoring.MainStreamList.values():
+    for stream in list(stb.ServiceMonitoring.MainStreamList.values()):
       if stream.X_GOOGLE_COM_StreamID == 3:
         self.assertEqual(stream.Total.MPEG2TSStats.TSPacketsReceived, 600)
     self.assertRaises(KeyError,
@@ -112,7 +112,7 @@ class STBServiceTest(unittest.TestCase):
     stbservice.CONT_MONITOR_FILES = savedfnames
     self.assertEqual(stb.ServiceMonitoring.MainStreamNumberOfEntries, 8)
     self.assertEqual(stream.Total.MPEG2TSStats.TSPacketsReceived, 600)
-    for stream in stb.ServiceMonitoring.MainStreamList.values():
+    for stream in list(stb.ServiceMonitoring.MainStreamList.values()):
       if stream.X_GOOGLE_COM_StreamID == 3:
         self.assertEqual(stream.Total.MPEG2TSStats.TSPacketsReceived, 600)
       if stream.X_GOOGLE_COM_StreamID == 6:
@@ -128,7 +128,7 @@ class STBServiceTest(unittest.TestCase):
     expected_discont = set([10, 20, 30, 40, 50, 60, 70, 80])
     actual_emptybuftime = set()
     actual_discont = set()
-    for v in stb.ServiceMonitoring.MainStreamList.values():
+    for v in list(stb.ServiceMonitoring.MainStreamList.values()):
       actual_emptybuftime.add(v.Total.DejitteringStats.EmptyBufferTime)
       actual_discont.add(v.Total.MPEG2TSStats.PacketDiscontinuityCounter)
     self.assertEqual(expected_emptybuftime, actual_emptybuftime)
@@ -150,7 +150,7 @@ class STBServiceTest(unittest.TestCase):
     actual_discont = set()
     actual_pkts = set()
     #using iterators to read the stream data. This should reduce the file reads.
-    for v in stb.ServiceMonitoring.MainStreamList.values():
+    for v in list(stb.ServiceMonitoring.MainStreamList.values()):
       tsstats = v.Total.MPEG2TSStats
       actual_discont.add(tsstats.PacketDiscontinuityCounter)
       actual_pkts.add(tsstats.TSPacketsReceived)
@@ -167,7 +167,7 @@ class STBServiceTest(unittest.TestCase):
     actual_emptybuftime = set()
     actual_underruns = set()
     actual_overruns = set()
-    for v in stb.ServiceMonitoring.MainStreamList.values():
+    for v in list(stb.ServiceMonitoring.MainStreamList.values()):
       djstats = v.Total.DejitteringStats
       actual_emptybuftime.add(djstats.EmptyBufferTime)
       actual_overruns.add(djstats.Overruns)
@@ -188,7 +188,7 @@ class STBServiceTest(unittest.TestCase):
     actual_pktsrcvd = set()
     actual_bytesrcvd = set()
     actual_pktsretran = set()
-    for v in stb.ServiceMonitoring.MainStreamList.values():
+    for v in list(stb.ServiceMonitoring.MainStreamList.values()):
       tcpstats = v.Total.TCPStats
       actual_pktsrcvd.add(tcpstats.PacketsReceived)
       actual_bytesrcvd.add(tcpstats.BytesReceived)
@@ -228,7 +228,7 @@ class STBServiceTest(unittest.TestCase):
     stbservice.HDMI_DISPLAY_DEVICE_STATS_FILES = self.STATS_FILES_NOEXST
     stb = stbservice.STBService()
     self.assertEqual(stb.Components.HDMINumberOfEntries, 1)
-    for v in stb.Components.HDMIList.values():
+    for v in list(stb.Components.HDMIList.values()):
       self.assertEqual(v.ResolutionMode, 'Auto')
       self.assertEqual(v.ResolutionValue, '')
       self.assertEqual(v.DisplayDevice.Status, 'None')
@@ -251,7 +251,7 @@ class STBServiceTest(unittest.TestCase):
     """Test deserialization of all HDMI stats parameters."""
     stb = stbservice.STBService()
     self.assertEqual(stb.Components.HDMINumberOfEntries, 1)
-    for v in stb.Components.HDMIList.values():
+    for v in list(stb.Components.HDMIList.values()):
       self.assertEqual(v.ResolutionMode, 'Auto')
       self.assertEqual(v.ResolutionValue, '640x480 @ 51Hz')
       self.assertEqual(v.DisplayDevice.Status, 'Present')
@@ -287,7 +287,7 @@ class STBServiceTest(unittest.TestCase):
     stbservice.HDMI_STATS_FILE = stbservice.PROCNETIGMP
     stb = stbservice.STBService()
     self.assertEqual(stb.Components.HDMINumberOfEntries, 1)
-    for v in stb.Components.HDMIList.values():
+    for v in list(stb.Components.HDMIList.values()):
       self.assertEqual(v.ResolutionMode, 'Auto')
       self.assertEqual(v.ResolutionValue, '')
       self.assertEqual(v.DisplayDevice.Name, 'X213W')
@@ -298,7 +298,7 @@ class STBServiceTest(unittest.TestCase):
         'testdata/stbservice/hdmi_dispdev_status.json']
     stb = stbservice.STBService()
     self.assertEqual(stb.Components.HDMINumberOfEntries, 1)
-    for v in stb.Components.HDMIList.values():
+    for v in list(stb.Components.HDMIList.values()):
       self.assertEqual(v.ResolutionMode, 'Auto')
       self.assertEqual(v.ResolutionValue, '640x480 @ 51Hz')
       self.assertEqual(v.DisplayDevice.Status, 'Present')

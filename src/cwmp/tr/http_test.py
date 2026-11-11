@@ -30,18 +30,18 @@ import time
 import unittest
 import xml.etree.ElementTree as ET
 
-import google3
+from . import google3
 import dm_root
 import tornado.httpclient
 import tornado.ioloop
 import tornado.testing
 import tornado.util
 
-import api
-import cwmp_session
-import cwmpdate
-import download
-import http
+from . import api
+from . import cwmp_session
+from . import cwmpdate
+from . import download
+from . import http
 
 
 mock_http_client_stop = None
@@ -83,7 +83,7 @@ class MockHttpClient(object):
     self.fetch_called = False
 
   def fetch(self, req, callback):
-    print '%s: fetching: %s %s' % (self, req, callback)
+    print('%s: fetching: %s %s' % (self, req, callback))
     self.fetch_req = req
     self.fetch_callback = callback
     self.fetch_called = True

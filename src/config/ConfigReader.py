@@ -17,7 +17,7 @@
 
 
 import os
-import ConfigParser
+import configparser
 
 class ConfigReader:
 
@@ -35,7 +35,7 @@ class ConfigReader:
 
     def getConfig(self, section, option, filename=None):
         value = ""
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
 
         if not filename:
             filename = self.configFile
@@ -44,8 +44,8 @@ class ConfigReader:
             config.read(filename)
             try:
                 value = config.get(section, option)
-            except (ConfigParser.NoSectionError, ConfigParser.NoOptionError) as msg:
-                print 'No section or option. Error code: ' + str(msg[0]) + ' , Error message : ' + msg[1]
+            except (configparser.NoSectionError, configparser.NoOptionError) as msg:
+                print('No section or option. Error code: ' + str(msg[0]) + ' , Error message : ' + msg[1])
         else:
-            print 'Invalid path for configuration file'
+            print('Invalid path for configuration file')
         return value

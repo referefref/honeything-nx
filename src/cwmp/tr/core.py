@@ -90,15 +90,15 @@ class AutoDict(object):
     return True
 
   def iterkeys(self):  #pylint: disable-msg=C6409
-    for (k, v) in self.iteritems():  #pylint: disable-msg=W0612
+    for (k, v) in self.items():  #pylint: disable-msg=W0612
       yield k
 
   def itervalues(self):  #pylint: disable-msg=C6409
-    for (k, v) in self.iteritems():  #pylint: disable-msg=W0612
+    for (k, v) in self.items():  #pylint: disable-msg=W0612
       yield v
 
   def __iter__(self):
-    return self.iterkeys()
+    return iter(self.keys())
 
   def __len__(self):
     count = 0
@@ -107,13 +107,13 @@ class AutoDict(object):
     return count
 
   def keys(self):  #pylint: disable-msg=C6409
-    return list(self.iterkeys())
+    return list(self.keys())
 
   def values(self):  #pylint: disable-msg=C6409
-    return list(self.itervalues())
+    return list(self.values())
 
   def items(self):  #pylint: disable-msg=C6409
-    return list(self.iteritems())
+    return list(self.items())
 
 
 def _Int(s):
@@ -144,7 +144,7 @@ class Exporter(object):
     self.export_object_lists = set()
     self.dirty = False  # object has pending SetParameters to be committed.
     if defaults:
-      for (key, value) in defaults.iteritems():
+      for (key, value) in defaults.items():
         setattr(self, key, value)
 
   def Export(self, params=None, objects=None, lists=None):
@@ -215,7 +215,7 @@ class Exporter(object):
       objlist = self._GetExport(self, name)
       if objlist == obj_to_find:
         return name
-      for (idx, child_obj) in objlist.iteritems():
+      for (idx, child_obj) in objlist.items():
         if child_obj == obj_to_find:
           return name + '.' + str(idx)
         tmp_path = child_obj.GetCanonicalName(obj_to_find)
@@ -260,11 +260,11 @@ class Exporter(object):
       self.AssertValidExport(name, path=path)
       l = self._GetExport(self, name)
       try:
-        for (iname, obj) in l.iteritems():  #pylint: disable-msg=W0612
+        for (iname, obj) in l.items():  #pylint: disable-msg=W0612
           pass
       except AttributeError:
         raise Exc(name + 'List', 'is an objlist but failed to iteritems')
-      for (iname, obj) in l.iteritems():
+      for (iname, obj) in l.items():
         if isinstance(obj, type):
           raise Exc('%s.%s' % (name, iname),
                     'is a type; instantiate it')
@@ -442,7 +442,7 @@ class Exporter(object):
       raise KeyError((name, idx))
 
   def _ListExportsFromDict(self, objlist, recursive):
-    for (idx, obj) in sorted(objlist.iteritems()):
+    for (idx, obj) in sorted(objlist.items()):
       if obj is not None:
         yield '%s.' % (idx,)
         if recursive:

@@ -26,7 +26,7 @@ and Google AppEngine.  It also will not work correctly when HTTPServer's
 multi-process mode is used.
 """
 
-from __future__ import absolute_import, division, with_statement
+
 
 import os
 import sys
@@ -128,7 +128,7 @@ def add_reload_hook(fn):
 
 
 def _close_all_fds(io_loop):
-    for fd in io_loop._handlers.keys():
+    for fd in list(io_loop._handlers.keys()):
         try:
             os.close(fd)
         except Exception:
@@ -146,7 +146,7 @@ def _reload_on_update(modify_times):
         # processes restarted themselves, they'd all restart and then
         # all call fork_processes again.
         return
-    for module in sys.modules.values():
+    for module in list(sys.modules.values()):
         # Some modules play games with sys.modules (e.g. email/__init__.py
         # in the standard library), and occasionally this can cause strange
         # failures in getattr.  Just ignore anything that's not an ordinary
@@ -251,7 +251,7 @@ def main():
         script = sys.argv[1]
         sys.argv = sys.argv[1:]
     else:
-        print >>sys.stderr, _USAGE
+        print(_USAGE, file=sys.stderr)
         sys.exit(1)
 
     try:
@@ -265,10 +265,10 @@ def main():
                 # Use globals as our "locals" dictionary so that
                 # something that tries to import __main__ (e.g. the unittest
                 # module) will see the right things.
-                exec f.read() in globals(), globals()
-    except SystemExit, e:
+                exec(f.read(), globals(), globals())
+    except SystemExit as e:
         logging.info("Script exited with status %s", e.code)
-    except Exception, e:
+    except Exception as e:
         logging.warning("Script exited with uncaught exception", exc_info=True)
         if isinstance(e, SyntaxError):
             watch(e.filename)

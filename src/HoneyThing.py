@@ -19,15 +19,15 @@
 import os
 import shlex
 import subprocess
-import BaseHTTPServer
+import http.server
 
-from SocketServer import ThreadingMixIn
+from socketserver import ThreadingMixIn
 from src.config.ConfigReader import ConfigReader
 from src.logger.HoneythingLogging import HTLogging
 from src.HTTPRequestHandler import HTTPRequestHandler
 
 
-class ThreadedHTTPServer(ThreadingMixIn, BaseHTTPServer.HTTPServer):
+class ThreadedHTTPServer(ThreadingMixIn, http.server.HTTPServer):
     pass
 
 
@@ -46,7 +46,7 @@ class HoneyThing:
 
     def run_HTTP(self):
 
-        print "Running HTTP..."
+        print("Running HTTP...")
 
         http_listen_address = self.cfg.getConfig("http", "address")
         http_port = self.cfg.getConfig("http", "port")
@@ -67,7 +67,7 @@ class HoneyThing:
 
     def run_CWMP(self):
 
-        print "Running CWMP..."
+        print("Running CWMP...")
 
         cwmp_listen_address = self.cfg.getConfig("cwmp", "address")
         cwmp_port = self.cfg.getConfig("cwmp", "port")

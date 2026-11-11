@@ -25,7 +25,7 @@ import subprocess
 import pynetlinux
 import tr.core
 import tr.tr181_v2_2
-import netdev
+from . import netdev
 
 
 BASE181MOCA = tr.tr181_v2_2.Device_v2_2.Device.MoCA

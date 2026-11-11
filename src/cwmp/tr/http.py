@@ -29,7 +29,7 @@ import random
 import socket
 import sys
 import time
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from curtain import digest
 import tornado.httpclient
@@ -37,13 +37,13 @@ import tornado.ioloop
 import tornado.util
 import tornado.web
 
-import api_soap
-import cpe_management_server
-import cwmp_session
-import helpers
+from . import api_soap
+from . import cpe_management_server
+from . import cwmp_session
+from . import helpers
 
-import soap
-from urlparse import urlparse
+from . import soap
+from urllib.parse import urlparse
 from src.logger.CWMPLogging import CWMPLogging
 from src.logger.HoneythingLogging import HTLogging
 
@@ -120,9 +120,9 @@ class LimitDeque(collections.deque):
 # http://www.broadband-forum.org/technical/download/TR-069_Amendment-3.pdf
 def SplitUrl(url):
   Url = collections.namedtuple('Url', ('method host port path'))
-  method, rest = urllib.splittype(url)
-  hostport, path = urllib.splithost(rest)
-  host, port = urllib.splitport(hostport)
+  method, rest = urllib.parse.splittype(url)
+  hostport, path = urllib.parse.splithost(rest)
+  host, port = urllib.parse.splitport(hostport)
   return Url(method, host, int(port or 0), path)
 
 

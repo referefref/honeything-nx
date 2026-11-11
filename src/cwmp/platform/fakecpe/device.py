@@ -22,7 +22,7 @@ __author__ = 'dgentry@google.com (Denton Gentry)'
 
 import os
 import sys
-import google3
+from . import google3
 import dm.device_info
 import dm.igd_time
 import dm.periodic_statistics
@@ -291,7 +291,7 @@ def main():
   tr.core.Dump(igd)
   device.ValidateExports()
   igd.ValidateExports()
-  print 'done'
+  print('done')
 
 if __name__ == '__main__':
   main()

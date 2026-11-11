@@ -18,17 +18,17 @@
 
 import os
 import cgi
-import Cookie
-import BaseHTTPServer
+import http.cookies
+import http.server
 
-from Auth import Auth
-from urlparse import urlparse
-from config.ConfigReader import ConfigReader
-from logger.HTTPLogging import HTTPLogging
-from logger.HoneythingLogging import HTLogging
+from .Auth import Auth
+from urllib.parse import urlparse
+from .config.ConfigReader import ConfigReader
+from .logger.HTTPLogging import HTTPLogging
+from .logger.HoneythingLogging import HTLogging
 
 
-class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class HTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
     sys_version = 'UPnP/1.0'
     server_version = 'RomPager/4.07'
@@ -54,7 +54,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.rom_0(self.get_path('/rom-0'))
 
         elif os.path.isfile(path):
-            if not self.get_session() and self.path not in redirects.values():
+            if not self.get_session() and self.path not in list(redirects.values()):
                 self.redirect_to(redirects['login'])
             else:
                 self.handle_data(path)
@@ -135,10 +135,10 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         auth = Auth()
         credentials = auth.get_credentials()
-        cookie = Cookie.SimpleCookie(self.headers.getheader('Cookie'))
+        cookie = http.cookies.SimpleCookie(self.headers.getheader('Cookie'))
         session = False
 
-        if cookie.has_key('C0') and cookie.has_key('C1'):
+        if 'C0' in cookie and 'C1' in cookie:
 
             if cookie['C0'].value == credentials['user'] and cookie['C1'].value == credentials['pass']:
                 session = True
@@ -179,7 +179,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             try:
                 f = open(path)
                 self.wfile.write(f.read())
-            except IOError, msg:
+            except IOError as msg:
                 HTTPRequestHandler.ht.logger.error('Error code: ' + str(msg[0]) + ' , Error message : ' + msg[1])
 
             finally:
@@ -263,9 +263,9 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def misfortune_cookie(self):
 
-        cookie = Cookie.SimpleCookie(self.headers.getheader('Cookie'))
+        cookie = http.cookies.SimpleCookie(self.headers.getheader('Cookie'))
 
-        if cookie.has_key('C107373883'):
+        if 'C107373883' in cookie:
             return cookie['C107373883'].value
 
 
@@ -305,7 +305,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         try:
             with open(path) as fp:
                 self.wfile.write(fp.read())
-        except IOError, msg:
+        except IOError as msg:
             HTTPRequestHandler.ht.logger.error('Error code: ' + str(msg[0]) + ' , Error message : ' + msg[1])
 
         self.log_http(200)

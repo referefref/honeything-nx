@@ -1,5 +1,5 @@
-from __future__ import with_statement
-from StringIO import StringIO
+
+from io import StringIO
 from xml.sax import saxutils
 from keyword import kwlist as PYTHON_KWORD_LIST
 
@@ -36,7 +36,7 @@ class Builder:
         
     def write(self, content):
         """Write raw content to the document"""
-        if type(content) is not unicode:
+        if type(content) is not str:
             content = content.decode(self._encoding)
         self._document.write('%s' % content)
 
@@ -92,7 +92,7 @@ class Element:
     def _serialized_attrs(self):
         """Serialize attributes for element insertion"""
         serialized = []
-        for attr, value in self.attributes.items():
+        for attr, value in list(self.attributes.items()):
             serialized.append(' %s=%s' % (
                 self._nameprep(attr), saxutils.quoteattr(value)
             ))

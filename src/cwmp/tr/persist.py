@@ -20,8 +20,8 @@ __author__ = 'apenwarr@google.com (Avery Pennarun)'
 import json
 import sqlite3
 
-import google3
-import core
+from . import google3
+from . import core
 
 
 #TODO(apenwarr): consider not just using json encoding for values.
@@ -52,9 +52,9 @@ class Store(object):
     q = 'select key, value from cfg order by key'
     for key, json_value in self.db.execute(q):
       if key.startswith(ignore_prefix):
-        print 'Skipping %s' % key
+        print('Skipping %s' % key)
         continue
-      print 'Loading %s' % key
+      print('Loading %s' % key)
       value = json.loads(json_value)
       if key.endswith('.'):
         # an object
@@ -62,18 +62,18 @@ class Store(object):
         try:
           parent, subname = self.root.FindExport(key, allow_create=True)
         except core.NotAddableError:
-          print 'Warning: %s cannot be created manually.' % key
+          print('Warning: %s cannot be created manually.' % key)
           ignore_prefix = key
         except KeyError:
-          print 'Warning: %s does not exist' % key
+          print('Warning: %s does not exist' % key)
         else:
-          print ' got %r, %r' % (parent, subname)
+          print(' got %r, %r' % (parent, subname))
       else:
         # a value
         try:
           self.root.SetExportParam(key, value)
-        except Exception, e:  #pylint: disable-msg=W0703
-          print "Warning: can't set %r=%r:\n\t%s" % (key, value, e)
+        except Exception as e:  #pylint: disable-msg=W0703
+          print("Warning: can't set %r=%r:\n\t%s" % (key, value, e))
 
   #TODO(apenwarr): save only params marked with a "persist" flag.
   #TODO(apenwarr): invent a "persist" flag.
@@ -89,6 +89,6 @@ class Store(object):
         self.db.execute('insert or replace into cfg (key, value) values (?,?)',
                         (key, json.dumps(value)))
       except sqlite3.InterfaceError:
-        print 'sqlite3 error: key=%r value=%r' % (key, value)
+        print('sqlite3 error: key=%r value=%r' % (key, value))
         raise
     self.db.commit()

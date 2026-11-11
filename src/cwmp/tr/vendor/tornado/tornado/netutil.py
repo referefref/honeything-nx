@@ -16,7 +16,7 @@
 
 """Miscellaneous network utility code."""
 
-from __future__ import absolute_import, division, with_statement
+
 
 import errno
 import logging
@@ -184,7 +184,7 @@ class TCPServer(object):
         Requests currently in progress may still continue after the
         server is stopped.
         """
-        for fd, sock in self._sockets.iteritems():
+        for fd, sock in self._sockets.items():
             self.io_loop.remove_handler(fd)
             sock.close()
 
@@ -200,12 +200,12 @@ class TCPServer(object):
                                              server_side=True,
                                              do_handshake_on_connect=False,
                                              **self.ssl_options)
-            except ssl.SSLError, err:
+            except ssl.SSLError as err:
                 if err.args[0] == ssl.SSL_ERROR_EOF:
                     return connection.close()
                 else:
                     raise
-            except socket.error, err:
+            except socket.error as err:
                 if err.args[0] == errno.ECONNABORTED:
                     return connection.close()
                 else:
@@ -271,7 +271,7 @@ def bind_sockets(port, address=None, family=socket.AF_UNSPEC, backlog=128):
     return sockets
 
 if hasattr(socket, 'AF_UNIX'):
-    def bind_unix_socket(file, mode=0600, backlog=128):
+    def bind_unix_socket(file, mode=0o600, backlog=128):
         """Creates a listening unix socket.
 
         If a socket with the given name already exists, it will be deleted.
@@ -287,7 +287,7 @@ if hasattr(socket, 'AF_UNIX'):
         sock.setblocking(0)
         try:
             st = os.stat(file)
-        except OSError, err:
+        except OSError as err:
             if err.errno != errno.ENOENT:
                 raise
         else:
@@ -317,7 +317,7 @@ def add_accept_handler(sock, callback, io_loop=None):
         while True:
             try:
                 connection, address = sock.accept()
-            except socket.error, e:
+            except socket.error as e:
                 if e.args[0] in (errno.EWOULDBLOCK, errno.EAGAIN):
                     return
                 raise

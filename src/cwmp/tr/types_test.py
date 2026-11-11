@@ -21,7 +21,7 @@
 __author__ = 'apenwarr@google.com (Avery Pennarun)'
 
 import unittest
-import google3
+from . import google3
 import tr.types
 
 
@@ -68,30 +68,30 @@ class ReadOnlyObject(object):
 class TypesTest(unittest.TestCase):
   def testTypes(self):
     obj = TestObject()
-    self.assertEquals(obj.a, None)
-    self.assertEquals(obj.b, None)
-    self.assertEquals(obj.s, 'defaultstring')
-    self.assertEquals(obj.i, None)
-    self.assertEquals(obj.e, None)
-    self.assertEquals(obj.e2, None)
+    self.assertEqual(obj.a, None)
+    self.assertEqual(obj.b, None)
+    self.assertEqual(obj.s, 'defaultstring')
+    self.assertEqual(obj.i, None)
+    self.assertEqual(obj.e, None)
+    self.assertEqual(obj.e2, None)
     o1 = object()
 
     obj.a = o1
-    self.assertEquals(obj.a, o1)
+    self.assertEqual(obj.a, o1)
     obj.a = None
-    self.assertEquals(obj.a, None)
+    self.assertEqual(obj.a, None)
 
     obj.b = 0
-    self.assertEquals(obj.b, 0)
+    self.assertEqual(obj.b, 0)
     self.assertNotEqual(obj.b, None)
     obj.b = False
-    self.assertEquals(obj.b, 0)
+    self.assertEqual(obj.b, 0)
     obj.b = 'FaLSe'
-    self.assertEquals(obj.b, 0)
+    self.assertEqual(obj.b, 0)
     self.assertTrue(obj.b is False)
     self.assertTrue(obj.b is not 0)
     obj.b = 'tRuE'
-    self.assertEquals(obj.b, 1)
+    self.assertEqual(obj.b, 1)
     self.assertTrue(obj.b is True)
     self.assertTrue(obj.b is not 1)
     self.assertRaises(ValueError, setattr, obj, 'b', '5')
@@ -99,42 +99,42 @@ class TypesTest(unittest.TestCase):
     self.assertRaises(ValueError, setattr, obj, 'b', object())
     self.assertRaises(ValueError, setattr, obj, 'b', [])
 
-    self.assertEquals(obj.s, 'defaultstring')
+    self.assertEqual(obj.s, 'defaultstring')
     obj.s = 1
-    self.assertEquals(obj.s, '1')
+    self.assertEqual(obj.s, '1')
     obj.s = o1
-    self.assertEquals(obj.s, str(o1))
+    self.assertEqual(obj.s, str(o1))
     obj.s = None
-    self.assertEquals(obj.s, None)
+    self.assertEqual(obj.s, None)
     self.assertNotEqual(obj.s, str(None))
     obj.s = ''
-    self.assertEquals(obj.s, '')
+    self.assertEqual(obj.s, '')
     self.assertNotEqual(obj.s, None)
 
     obj.i = 7
-    self.assertEquals(obj.i, 7)
+    self.assertEqual(obj.i, 7)
     obj.i = '8'
-    self.assertEquals(obj.i, 8)
+    self.assertEqual(obj.i, 8)
     self.assertRaises(ValueError, setattr, obj, 'i', '')
 
     obj.u = '5'
-    self.assertEquals(obj.u, 5)
+    self.assertEqual(obj.u, 5)
     obj.u = 0
-    self.assertEquals(obj.u, 0)
+    self.assertEqual(obj.u, 0)
     self.assertRaises(ValueError, setattr, obj, 'u', '-5')
     self.assertRaises(ValueError, setattr, obj, 'u', -5)
 
     obj.f = '5'
-    self.assertEquals(obj.f, 5.0)
+    self.assertEqual(obj.f, 5.0)
     obj.f = 0
-    self.assertEquals(obj.f, 0)
+    self.assertEqual(obj.f, 0)
     obj.f = 5e60
-    self.assertEquals(obj.f, 5e60)
+    self.assertEqual(obj.f, 5e60)
 
     obj.e = 'one'
-    self.assertEquals(obj.e, 'one')
+    self.assertEqual(obj.e, 'one')
     obj.e = 7
-    self.assertEquals(obj.e, 7)
+    self.assertEqual(obj.e, 7)
     self.assertRaises(ValueError, setattr, obj, 'e', '7')
     obj.e = None
 
@@ -143,50 +143,50 @@ class TypesTest(unittest.TestCase):
 
   def testTriggers(self):
     obj = TriggerObject()
-    self.assertEquals(obj.xval, 7)
-    self.assertEquals(obj.triggers, 0)
+    self.assertEqual(obj.xval, 7)
+    self.assertEqual(obj.triggers, 0)
 
     obj.val = 99
-    self.assertEquals(obj.xval, 99)
-    self.assertEquals(obj.val, 99)
-    self.assertEquals(obj.triggers, 1)
+    self.assertEqual(obj.xval, 99)
+    self.assertEqual(obj.val, 99)
+    self.assertEqual(obj.triggers, 1)
     obj.val = 99
-    self.assertEquals(obj.triggers, 1)
+    self.assertEqual(obj.triggers, 1)
     obj.val = 98
-    self.assertEquals(obj.triggers, 2)
+    self.assertEqual(obj.triggers, 2)
 
     obj.a = 5
-    self.assertEquals(obj.triggers, 3)
+    self.assertEqual(obj.triggers, 3)
     obj.a = '5'
-    self.assertEquals(obj.triggers, 4)
+    self.assertEqual(obj.triggers, 4)
     obj.a = '5'
-    self.assertEquals(obj.triggers, 4)
+    self.assertEqual(obj.triggers, 4)
 
     obj.b = 0
-    self.assertEquals(obj.triggers, 5)
+    self.assertEqual(obj.triggers, 5)
     obj.b = '0'
-    self.assertEquals(obj.triggers, 5)
+    self.assertEqual(obj.triggers, 5)
     obj.b = 'TRuE'
-    self.assertEquals(obj.b, 1)
-    self.assertEquals(obj.triggers, 6)
+    self.assertEqual(obj.b, 1)
+    self.assertEqual(obj.triggers, 6)
 
     # test that exceptions get passed through
     obj.i = 9
-    self.assertEquals(obj.triggers, 7)
+    self.assertEqual(obj.triggers, 7)
     self.assertRaises(ValueError, setattr, obj, 'i', '1.2')
-    self.assertEquals(obj.triggers, 7)
+    self.assertEqual(obj.triggers, 7)
 
   def testReadOnly(self):
     obj = ReadOnlyObject()
     self.assertRaises(AttributeError, setattr, obj, 'b', True)
     self.assertRaises(AttributeError, setattr, obj, 'b', False)
-    self.assertEquals(obj.b, True)
+    self.assertEqual(obj.b, True)
     type(obj).b.Set(obj, False)
-    self.assertEquals(obj.b, False)
+    self.assertEqual(obj.b, False)
 
-    self.assertEquals(obj.i, 5)
-    self.assertEquals(obj.s, 'foo')
-    self.assertEquals(obj.e, None)
+    self.assertEqual(obj.i, 5)
+    self.assertEqual(obj.s, 'foo')
+    self.assertEqual(obj.e, None)
     self.assertRaises(AttributeError, setattr, obj, 'i', 5)
     self.assertRaises(AttributeError, setattr, obj, 's', 'foo')
     self.assertRaises(AttributeError, setattr, obj, 'e', None)

@@ -44,7 +44,7 @@ before closing the `IOLoop`.
 This module has been tested with Twisted versions 11.0.0, 11.1.0, and 12.0.0
 """
 
-from __future__ import absolute_import, division, with_statement
+
 
 import functools
 import logging
@@ -278,10 +278,10 @@ class TornadoReactor(PosixReactorBase):
         return self._removeAll(self._readers, self._writers)
 
     def getReaders(self):
-        return self._readers.keys()
+        return list(self._readers.keys())
 
     def getWriters(self):
-        return self._writers.keys()
+        return list(self._writers.keys())
 
     # The following functions are mainly used in twisted-style test cases;
     # it is expected that most users of the TornadoReactor will call

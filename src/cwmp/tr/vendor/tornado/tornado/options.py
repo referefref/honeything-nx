@@ -48,7 +48,7 @@ kwarg to define). We also accept multi-value options. See the documentation
 for define() below.
 """
 
-from __future__ import absolute_import, division, with_statement
+
 
 import datetime
 import logging
@@ -116,7 +116,7 @@ class _Options(dict):
         if args is None:
             args = sys.argv
         remaining = []
-        for i in xrange(1, len(args)):
+        for i in range(1, len(args)):
             # All things after the last option are command line arguments
             if not args[i].startswith("-"):
                 remaining = args[i:]
@@ -150,22 +150,22 @@ class _Options(dict):
 
     def parse_config_file(self, path):
         config = {}
-        execfile(path, config, config)
+        exec(compile(open(path, "rb").read(), path, 'exec'), config, config)
         for name in config:
             if name in self:
                 self[name].set(config[name])
 
     def print_help(self, file=sys.stdout):
         """Prints all the command line options to stdout."""
-        print >> file, "Usage: %s [OPTIONS]" % sys.argv[0]
-        print >> file, "\nOptions:\n"
+        print("Usage: %s [OPTIONS]" % sys.argv[0], file=file)
+        print("\nOptions:\n", file=file)
         by_group = {}
-        for option in self.itervalues():
+        for option in self.values():
             by_group.setdefault(option.group_name, []).append(option)
 
         for filename, o in sorted(by_group.items()):
             if filename:
-                print >> file, "\n%s options:\n" % os.path.normpath(filename)
+                print("\n%s options:\n" % os.path.normpath(filename), file=file)
             o.sort(key=lambda option: option.name)
             for option in o:
                 prefix = option.name
@@ -177,14 +177,14 @@ class _Options(dict):
                 lines = textwrap.wrap(description, 79 - 35)
                 if len(prefix) > 30 or len(lines) == 0:
                     lines.insert(0, '')
-                print >> file, "  --%-30s %s" % (prefix, lines[0])
+                print("  --%-30s %s" % (prefix, lines[0]), file=file)
                 for line in lines[1:]:
-                    print >> file, "%-34s %s" % (' ', line)
-        print >> file
+                    print("%-34s %s" % (' ', line), file=file)
+        print(file=file)
 
 
 class _Option(object):
-    def __init__(self, name, default=None, type=basestring, help=None, metavar=None,
+    def __init__(self, name, default=None, type=str, help=None, metavar=None,
                  multiple=False, file_name=None, group_name=None):
         if default is None and multiple:
             default = []
@@ -206,17 +206,17 @@ class _Option(object):
             datetime.datetime: self._parse_datetime,
             datetime.timedelta: self._parse_timedelta,
             bool: self._parse_bool,
-            basestring: self._parse_string,
+            str: self._parse_string,
         }.get(self.type, self.type)
         if self.multiple:
             self._value = []
             for part in value.split(","):
-                if self.type in (int, long):
+                if self.type in (int, int):
                     # allow ranges of the form X:Y (inclusive at both ends)
                     lo, _, hi = part.partition(":")
                     lo = _parse(lo)
                     hi = _parse(hi) if hi else lo
-                    self._value.extend(range(lo, hi + 1))
+                    self._value.extend(list(range(lo, hi + 1)))
                 else:
                     self._value.append(_parse(part))
         else:
@@ -403,23 +403,23 @@ class _LogFormatter(logging.Formatter):
             fg_color = (curses.tigetstr("setaf") or
                         curses.tigetstr("setf") or "")
             if (3, 0) < sys.version_info < (3, 2, 3):
-                fg_color = unicode(fg_color, "ascii")
+                fg_color = str(fg_color, "ascii")
             self._colors = {
-                logging.DEBUG: unicode(curses.tparm(fg_color, 4),  # Blue
+                logging.DEBUG: str(curses.tparm(fg_color, 4),  # Blue
                                        "ascii"),
-                logging.INFO: unicode(curses.tparm(fg_color, 2),  # Green
+                logging.INFO: str(curses.tparm(fg_color, 2),  # Green
                                       "ascii"),
-                logging.WARNING: unicode(curses.tparm(fg_color, 3),  # Yellow
+                logging.WARNING: str(curses.tparm(fg_color, 3),  # Yellow
                                          "ascii"),
-                logging.ERROR: unicode(curses.tparm(fg_color, 1),  # Red
+                logging.ERROR: str(curses.tparm(fg_color, 1),  # Red
                                        "ascii"),
             }
-            self._normal = unicode(curses.tigetstr("sgr0"), "ascii")
+            self._normal = str(curses.tigetstr("sgr0"), "ascii")
 
     def format(self, record):
         try:
             record.message = record.getMessage()
-        except Exception, e:
+        except Exception as e:
             record.message = "Bad message (%r): %r" % (e, record.__dict__)
         record.asctime = time.strftime(
             "%y%m%d %H:%M:%S", self.converter(record.created))

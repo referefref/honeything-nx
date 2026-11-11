@@ -14,7 +14,7 @@
 #
 """Auto-generated from spec: urn:google-com:x-gmoca-1-0."""
 
-import core
+from . import core
 
 
 class X_GOOGLE_COM_GMOCA_v1_0(core.Exporter):
@@ -26,4 +26,4 @@ class X_GOOGLE_COM_GMOCA_v1_0(core.Exporter):
 
 
 if __name__ == '__main__':
-  print core.DumpSchema(X_GOOGLE_COM_GMOCA_v1_0)
+  print(core.DumpSchema(X_GOOGLE_COM_GMOCA_v1_0))

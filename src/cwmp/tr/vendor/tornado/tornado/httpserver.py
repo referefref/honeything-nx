@@ -24,9 +24,9 @@ This module also defines the `HTTPRequest` class which is exposed via
 `tornado.web.RequestHandler.request`.
 """
 
-from __future__ import absolute_import, division, with_statement
 
-import Cookie
+
+import http.cookies
 import logging
 import socket
 
@@ -259,7 +259,7 @@ class HTTPConnection(object):
                 return
 
             self.request_callback(self._request)
-        except _BadRequestException, e:
+        except _BadRequestException as e:
             logging.info("Malformed HTTP request from %s: %s",
                          self.address[0], e)
             self.stream.close()
@@ -271,7 +271,7 @@ class HTTPConnection(object):
         if self._request.method in ("POST", "PATCH", "PUT"):
             if content_type.startswith("application/x-www-form-urlencoded"):
                 arguments = parse_qs_bytes(native_str(self._request.body))
-                for name, values in arguments.iteritems():
+                for name, values in arguments.items():
                     values = [v for v in values if v]
                     if values:
                         self._request.arguments.setdefault(name, []).extend(
@@ -400,7 +400,7 @@ class HTTPRequest(object):
         self.path, sep, self.query = uri.partition('?')
         arguments = parse_qs_bytes(self.query)
         self.arguments = {}
-        for name, values in arguments.iteritems():
+        for name, values in arguments.items():
             values = [v for v in values if v]
             if values:
                 self.arguments[name] = values
@@ -413,7 +413,7 @@ class HTTPRequest(object):
     def cookies(self):
         """A dictionary of Cookie.Morsel objects."""
         if not hasattr(self, "_cookies"):
-            self._cookies = Cookie.SimpleCookie()
+            self._cookies = http.cookies.SimpleCookie()
             if "Cookie" in self.headers:
                 try:
                     self._cookies.load(
@@ -478,7 +478,7 @@ class HTTPRequest(object):
                                      socket.SOCK_STREAM,
                                      0, socket.AI_NUMERICHOST)
             return bool(res)
-        except socket.gaierror, e:
+        except socket.gaierror as e:
             if e.args[0] == socket.EAI_NONAME:
                 return False
             raise

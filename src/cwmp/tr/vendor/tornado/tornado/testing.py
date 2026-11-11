@@ -18,9 +18,9 @@ inheritance.  See the docstrings for each class/function below for more
 information.
 """
 
-from __future__ import absolute_import, division, with_statement
 
-from cStringIO import StringIO
+
+from io import StringIO
 try:
     from tornado.httpclient import AsyncHTTPClient
     from tornado.httpserver import HTTPServer
@@ -366,7 +366,7 @@ def main():
         signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     if __name__ == '__main__' and len(argv) == 1:
-        print >> sys.stderr, "No tests specified"
+        print("No tests specified", file=sys.stderr)
         sys.exit(1)
     try:
         # In order to be able to run tests by their fully-qualified name
@@ -379,7 +379,7 @@ def main():
             unittest.main(module=None, argv=argv)
         else:
             unittest.main(defaultTest="all", argv=argv)
-    except SystemExit, e:
+    except SystemExit as e:
         if e.code == 0:
             logging.info('PASS')
         else:

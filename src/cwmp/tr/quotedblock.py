@@ -43,7 +43,7 @@ __author__ = 'apenwarr@google.com (Avery Pennarun)'
 
 
 import bup.shquote
-import mainloop
+from . import mainloop
 
 
 class QuotedBlockProtocol(object):
@@ -162,7 +162,7 @@ class QuotedBlockStreamer(object):
 
   def ProcessBlock(self, lines):
     """Redefine this function to respond to incoming requests how you want."""
-    print 'lines: %r' % (lines,)
+    print('lines: %r' % (lines,))
     return [['RESPONSE:']] + lines + [['EOR']]
 
 
@@ -170,7 +170,7 @@ def main():
   loop = mainloop.MainLoop()
   loop.ListenInet6(('', 12999), QuotedBlockStreamer)
   loop.ListenUnix('/tmp/cwmpd.sock', QuotedBlockStreamer)
-  print 'hello'
+  print('hello')
   loop.Start()
 
 

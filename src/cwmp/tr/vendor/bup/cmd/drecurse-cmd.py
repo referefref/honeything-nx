@@ -32,7 +32,7 @@ else:
             pass
     else:
         for (name,st) in it:
-            print name
+            print(name)
 
 if saved_errors:
     log('WARNING: %d errors encountered.\n' % len(saved_errors))

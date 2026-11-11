@@ -102,7 +102,7 @@ def parse_command_line(args=None):
     """
     if args is None: args = sys.argv
     remaining = []
-    for i in xrange(1, len(args)):
+    for i in range(1, len(args)):
         # All things after the last option are command line arguments
         if not args[i].startswith("-"):
             remaining = args[i:]
@@ -138,7 +138,7 @@ def parse_command_line(args=None):
 def parse_config_file(path):
     """Parses and loads the Python config file at the given path."""
     config = {}
-    execfile(path, config, config)
+    exec(compile(open(path, "rb").read(), path, 'exec'), config, config)
     for name in config:
         if name in options:
             options[name].set(config[name])
@@ -146,22 +146,22 @@ def parse_config_file(path):
 
 def print_help(file=sys.stdout):
     """Prints all the command line options to stdout."""
-    print >> file, "Usage: %s [OPTIONS]" % sys.argv[0]
-    print >> file, ""
-    print >> file, "Options:"
+    print("Usage: %s [OPTIONS]" % sys.argv[0], file=file)
+    print("", file=file)
+    print("Options:", file=file)
     by_file = {}
-    for option in options.itervalues():
+    for option in options.values():
         by_file.setdefault(option.file_name, []).append(option)
 
     for filename, o in sorted(by_file.items()):
-        if filename: print >> file, filename
+        if filename: print(filename, file=file)
         o.sort(key=lambda option: option.name)
         for option in o:
             prefix = option.name
             if option.metavar:
                 prefix += "=" + option.metavar
-            print >> file, "  --%-30s %s" % (prefix, option.help or "")
-    print >> file
+            print("  --%-30s %s" % (prefix, option.help or ""), file=file)
+    print(file=file)
 
 
 class _Options(dict):
@@ -206,12 +206,12 @@ class _Option(object):
             if self._value is None:
                 self._value = []
             for part in value.split(","):
-                if self.type in (int, long):
+                if self.type in (int, int):
                     # allow ranges of the form X:Y (inclusive at both ends)
                     lo, _, hi = part.partition(":")
                     lo = _parse(lo)
                     hi = _parse(hi) if hi else lo
-                    self._value.extend(range(lo, hi+1))
+                    self._value.extend(list(range(lo, hi+1)))
                 else:
                     self._value.append(_parse(part))
         else:
@@ -345,7 +345,7 @@ class _LogFormatter(logging.Formatter):
     def format(self, record):
         try:
             record.message = record.getMessage()
-        except Exception, e:
+        except Exception as e:
             record.message = "Bad message (%r): %r" % (e, record.__dict__)
         record.asctime = time.strftime(
             "%y%m%d %H:%M:%S", self.converter(record.created))

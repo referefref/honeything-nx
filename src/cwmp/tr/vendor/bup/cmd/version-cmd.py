@@ -19,8 +19,8 @@ if total > 1:
     o.fatal('at most one option expected')
 
 if opt.date:
-    print version_date()
+    print(version_date())
 elif opt.commit:
-    print version_commit()
+    print(version_commit())
 else:
-    print version_tag()
+    print(version_tag())

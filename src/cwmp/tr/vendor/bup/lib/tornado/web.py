@@ -46,28 +46,28 @@ getting started guide.
 import base64
 import binascii
 import calendar
-import Cookie
-import cStringIO
+import http.cookies
+import io
 import datetime
 import email.utils
-import escape
+from . import escape
 import functools
 import gzip
 import hashlib
 import hmac
-import httplib
-import locale
+import http.client
+from . import locale
 import logging
 import mimetypes
 import os.path
 import re
 import stat
 import sys
-import template
+from . import template
 import time
 import types
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
 import uuid
 
 class RequestHandler(object):
@@ -87,9 +87,9 @@ class RequestHandler(object):
         self._auto_finish = True
         self._transforms = transforms or []
         self.ui = _O((n, self._ui_method(m)) for n, m in
-                     application.ui_methods.iteritems())
+                     application.ui_methods.items())
         self.ui["modules"] = _O((n, self._ui_module(n, m)) for n, m in
-                                application.ui_modules.iteritems())
+                                application.ui_modules.items())
         self.clear()
         # Check since connection is not available in WSGI
         if hasattr(self.request, "connection"):
@@ -152,7 +152,7 @@ class RequestHandler(object):
 
     def set_status(self, status_code):
         """Sets the status code for our response."""
-        assert status_code in httplib.responses
+        assert status_code in http.client.responses
         self._status_code = status_code
 
     def set_header(self, name, value):
@@ -165,7 +165,7 @@ class RequestHandler(object):
         if isinstance(value, datetime.datetime):
             t = calendar.timegm(value.utctimetuple())
             value = email.utils.formatdate(t, localtime=False, usegmt=True)
-        elif isinstance(value, int) or isinstance(value, long):
+        elif isinstance(value, int) or isinstance(value, int):
             value = str(value)
         else:
             value = _utf8(value)
@@ -216,7 +216,7 @@ class RequestHandler(object):
     def cookies(self):
         """A dictionary of Cookie.Morsel objects."""
         if not hasattr(self, "_cookies"):
-            self._cookies = Cookie.BaseCookie()
+            self._cookies = http.cookies.BaseCookie()
             if "Cookie" in self.request.headers:
                 try:
                     self._cookies.load(self.request.headers["Cookie"])
@@ -246,7 +246,7 @@ class RequestHandler(object):
             raise ValueError("Invalid cookie %r: %r" % (name, value))
         if not hasattr(self, "_new_cookies"):
             self._new_cookies = []
-        new_cookie = Cookie.BaseCookie()
+        new_cookie = http.cookies.BaseCookie()
         self._new_cookies.append(new_cookie)
         new_cookie[name] = value
         if domain:
@@ -260,7 +260,7 @@ class RequestHandler(object):
                 timestamp, localtime=False, usegmt=True)
         if path:
             new_cookie[name]["path"] = path
-        for k, v in kwargs.iteritems():
+        for k, v in kwargs.items():
             new_cookie[name][k] = v
 
     def clear_cookie(self, name, path="/", domain=None):
@@ -271,7 +271,7 @@ class RequestHandler(object):
 
     def clear_all_cookies(self):
         """Deletes all the cookies the user sent with this request."""
-        for name in self.cookies.iterkeys():
+        for name in self.cookies.keys():
             self.clear_cookie(name)
 
     def set_secure_cookie(self, name, value, expires_days=30, **kwargs):
@@ -333,7 +333,7 @@ class RequestHandler(object):
         self.set_status(301 if permanent else 302)
         # Remove whitespace
         url = re.sub(r"[\x00-\x20]+", "", _utf8(url))
-        self.set_header("Location", urlparse.urljoin(self.request.uri, url))
+        self.set_header("Location", urllib.parse.urljoin(self.request.uri, url))
         self.finish()
 
     def write(self, chunk):
@@ -362,12 +362,12 @@ class RequestHandler(object):
         css_files = []
         html_heads = []
         html_bodies = []
-        for module in getattr(self, "_active_modules", {}).itervalues():
+        for module in getattr(self, "_active_modules", {}).values():
             embed_part = module.embedded_javascript()
             if embed_part: js_embed.append(_utf8(embed_part))
             file_part = module.javascript_files()
             if file_part:
-                if isinstance(file_part, basestring):
+                if isinstance(file_part, str):
                     js_files.append(file_part)
                 else:
                     js_files.extend(file_part)
@@ -375,7 +375,7 @@ class RequestHandler(object):
             if embed_part: css_embed.append(_utf8(embed_part))
             file_part = module.css_files()
             if file_part:
-                if isinstance(file_part, basestring):
+                if isinstance(file_part, str):
                     css_files.append(file_part)
                 else:
                     css_files.extend(file_part)
@@ -552,7 +552,7 @@ class RequestHandler(object):
         return "<html><title>%(code)d: %(message)s</title>" \
                "<body>%(code)d: %(message)s</body></html>" % {
             "code": status_code,
-            "message": httplib.responses[status_code],
+            "message": http.client.responses[status_code],
         }
 
     @property
@@ -597,7 +597,7 @@ class RequestHandler(object):
                     score = 1.0
                 locales.append((parts[0], score))
             if locales:
-                locales.sort(key=lambda (l, s): s, reverse=True)
+                locales.sort(key=lambda l_s: l_s[1], reverse=True)
                 codes = [l[0] for l in locales]
                 return locale.get(*codes)
         return locale.get(default)
@@ -738,7 +738,7 @@ class RequestHandler(object):
         def wrapper(*args, **kwargs):
             try:
                 return callback(*args, **kwargs)
-            except Exception, e:
+            except Exception as e:
                 if self._headers_written:
                     logging.error("Exception after headers written",
                                   exc_info=True)
@@ -771,15 +771,15 @@ class RequestHandler(object):
                 getattr(self, self.request.method.lower())(*args, **kwargs)
                 if self._auto_finish and not self._finished:
                     self.finish()
-        except Exception, e:
+        except Exception as e:
             self._handle_request_exception(e)
 
     def _generate_headers(self):
         lines = [self.request.version + " " + str(self._status_code) + " " +
-                 httplib.responses[self._status_code]]
-        lines.extend(["%s: %s" % (n, v) for n, v in self._headers.iteritems()])
+                 http.client.responses[self._status_code]]
+        lines.extend(["%s: %s" % (n, v) for n, v in self._headers.items()])
         for cookie_dict in getattr(self, "_new_cookies", []):
-            for cookie in cookie_dict.values():
+            for cookie in list(cookie_dict.values()):
                 lines.append("Set-Cookie: " + cookie.OutputString(None))
         return "\r\n".join(lines) + "\r\n\r\n"
 
@@ -804,7 +804,7 @@ class RequestHandler(object):
                 format = "%d %s: " + e.log_message
                 args = [e.status_code, self._request_summary()] + list(e.args)
                 logging.warning(format, *args)
-            if e.status_code not in httplib.responses:
+            if e.status_code not in http.client.responses:
                 logging.error("Bad HTTP status code: %d", e.status_code)
                 self.send_error(500, exception=e)
             else:
@@ -968,7 +968,7 @@ class Application(object):
 
         # Automatically reload modified modules
         if self.settings.get("debug") and not wsgi:
-            import autoreload
+            from . import autoreload
             autoreload.start()
 
     def add_handlers(self, host_pattern, host_handlers):
@@ -1027,7 +1027,7 @@ class Application(object):
         elif isinstance(methods, list):
             for m in methods: self._load_ui_methods(m)
         else:
-            for name, fn in methods.iteritems():
+            for name, fn in methods.items():
                 if not name.startswith("_") and hasattr(fn, "__call__") \
                    and name[0].lower() == name[0]:
                     self.ui_methods[name] = fn
@@ -1040,7 +1040,7 @@ class Application(object):
             for m in modules: self._load_ui_modules(m)
         else:
             assert isinstance(modules, dict)
-            for name, cls in modules.iteritems():
+            for name, cls in modules.items():
                 try:
                     if issubclass(cls, UIModule):
                         self.ui_modules[name] = cls
@@ -1065,12 +1065,12 @@ class Application(object):
                     # Pass matched groups to the handler.  Since
                     # match.groups() includes both named and unnamed groups,
                     # we want to use either groups or groupdict but not both.
-                    kwargs = dict((k, urllib.unquote(v))
-                                  for (k, v) in match.groupdict().iteritems())
+                    kwargs = dict((k, urllib.parse.unquote(v))
+                                  for (k, v) in match.groupdict().items())
                     if kwargs:
                         args = []
                     else:
-                        args = [urllib.unquote(s) for s in match.groups()]
+                        args = [urllib.parse.unquote(s) for s in match.groups()]
                     break
             if not handler:
                 handler = ErrorHandler(self, request, 404)
@@ -1079,8 +1079,8 @@ class Application(object):
         # request so you don't need to restart to see changes
         if self.settings.get("debug"):
             if getattr(RequestHandler, "_templates", None):
-              map(lambda loader: loader.reset(),
-                  RequestHandler._templates.values())
+              list(map(lambda loader: loader.reset(),
+                  list(RequestHandler._templates.values())))
             RequestHandler._static_hashes = {}
 
         handler._execute(transforms, *args, **kwargs)
@@ -1105,7 +1105,7 @@ class HTTPError(Exception):
 
     def __str__(self):
         message = "HTTP %d: %s" % (
-            self.status_code, httplib.responses[self.status_code])
+            self.status_code, http.client.responses[self.status_code])
         if self.log_message:
             return message + " (" + (self.log_message % self.args) + ")"
         else:
@@ -1278,7 +1278,7 @@ class GZipContentEncoding(OutputTransform):
                 ("Content-Encoding" not in headers)
         if self._gzipping:
             headers["Content-Encoding"] = "gzip"
-            self._gzip_value = cStringIO.StringIO()
+            self._gzip_value = io.StringIO()
             self._gzip_file = gzip.GzipFile(mode="w", fileobj=self._gzip_value)
             self._gzip_pos = 0
             chunk = self.transform_chunk(chunk, finishing)
@@ -1337,7 +1337,7 @@ def authenticated(method):
             if self.request.method == "GET":
                 url = self.get_login_url()
                 if "?" not in url:
-                    url += "?" + urllib.urlencode(dict(next=self.request.uri))
+                    url += "?" + urllib.parse.urlencode(dict(next=self.request.uri))
                 self.redirect(url)
                 return
             raise HTTPError(403)
@@ -1452,7 +1452,7 @@ class URLSpec(object):
 url = URLSpec
 
 def _utf8(s):
-    if isinstance(s, unicode):
+    if isinstance(s, str):
         return s.encode("utf-8")
     assert isinstance(s, str)
     return s
@@ -1464,7 +1464,7 @@ def _unicode(s):
             return s.decode("utf-8")
         except UnicodeDecodeError:
             raise HTTPError(400, "Non-utf8 argument")
-    assert isinstance(s, unicode)
+    assert isinstance(s, str)
     return s
 
 

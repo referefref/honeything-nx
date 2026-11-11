@@ -67,7 +67,7 @@ def auto_midx(objdir):
     args = [path.exe(), 'midx', '--auto', '--dir', objdir]
     try:
         rv = subprocess.call(args, stdout=open('/dev/null', 'w'))
-    except OSError, e:
+    except OSError as e:
         # make sure 'args' gets printed to help with debugging
         add_error('%r: exception: %s' % (args, e))
         raise
@@ -77,7 +77,7 @@ def auto_midx(objdir):
     args = [path.exe(), 'bloom', '--dir', objdir]
     try:
         rv = subprocess.call(args, stdout=open('/dev/null', 'w'))
-    except OSError, e:
+    except OSError as e:
         # make sure 'args' gets printed to help with debugging
         add_error('%r: exception: %s' % (args, e))
         raise
@@ -287,7 +287,7 @@ class PackIdxV1(PackIdx):
         return str(self.shatable[idx*24+4 : idx*24+24])
 
     def __iter__(self):
-        for i in xrange(self.fanout[255]):
+        for i in range(self.fanout[255]):
             yield buffer(self.map, 256*4 + 24*i + 4, 20)
 
 
@@ -322,7 +322,7 @@ class PackIdxV2(PackIdx):
         return str(self.shatable[idx*20:(idx+1)*20])
 
     def __iter__(self):
-        for i in xrange(self.fanout[255]):
+        for i in range(self.fanout[255]):
             yield buffer(self.map, 8 + 256*4 + 20*i, 20)
 
 
@@ -362,7 +362,7 @@ class PackIdxList:
             else:
                 _total_searches -= 1  # was counted by bloom
                 return None
-        for i in xrange(len(self.packs)):
+        for i in range(len(self.packs)):
             p = self.packs[i]
             _total_searches -= 1  # will be incremented by sub-pack
             ix = p.exists(hash, want_source=want_source)
@@ -434,7 +434,7 @@ class PackIdxList:
                 if not d.get(full):
                     try:
                         ix = open_idx(full)
-                    except GitError, e:
+                    except GitError as e:
                         add_error(e)
                         continue
                     d[full] = ix
@@ -513,7 +513,7 @@ class PackWriter:
             assert(name.endswith('.pack'))
             self.filename = name[:-5]
             self.file.write('PACK\0\0\0\2\0\0\0\0')
-            self.idx = list(list() for i in xrange(256))
+            self.idx = list(list() for i in range(256))
 
     def _raw_write(self, datalist, sha):
         self._open()
@@ -526,8 +526,8 @@ class PackWriter:
         oneblob = ''.join(datalist)
         try:
             f.write(oneblob)
-        except IOError, e:
-            raise GitError, e, sys.exc_info()[2]
+        except IOError as e:
+            raise GitError(e).with_traceback(sys.exc_info()[2])
         nw = len(oneblob)
         crc = zlib.crc32(oneblob) & 0xffffffff
         self._update_idx(sha, crc, nw)
@@ -749,14 +749,14 @@ def rev_list(ref, count=None):
             yield (date, commit)
     rv = p.wait()  # not fatal
     if rv:
-        raise GitError, 'git rev-list returned error %d' % rv
+        raise GitError('git rev-list returned error %d' % rv)
 
 
 def rev_get_date(ref):
     """Get the date of the latest commit on the specified ref."""
     for (date, commit) in rev_list(ref, count=1):
         return date
-    raise GitError, 'no such commit %r' % ref
+    raise GitError('no such commit %r' % ref)
 
 
 def rev_parse(committish):
@@ -840,7 +840,7 @@ def check_repo_or_die(path=None):
     guess_repo(path)
     try:
         os.stat(repo('objects/pack/.'))
-    except OSError, e:
+    except OSError as e:
         if e.errno == errno.ENOENT:
             if repodir != home_repodir:
                 log('error: %r is not a bup repository; run "bup init"\n'
@@ -902,10 +902,10 @@ class _AbortableIter:
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         try:
-            return self.it.next()
-        except StopIteration, e:
+            return next(self.it)
+        except StopIteration as e:
             self.done = True
             raise
         except:
@@ -987,7 +987,7 @@ class CatPipe:
                 yield blob
             assert(self.p.stdout.readline() == '\n')
             self.inprogress = None
-        except Exception, e:
+        except Exception as e:
             it.abort()
             raise
 
@@ -1006,7 +1006,7 @@ class CatPipe:
         _git_wait('git cat-file', p)
 
     def _join(self, it):
-        type = it.next()
+        type = next(it)
         if type == 'blob':
             for blob in it:
                 yield blob

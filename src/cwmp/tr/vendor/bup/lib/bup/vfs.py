@@ -5,7 +5,7 @@ and abstracts internal name mangling and storage from the exposition layer.
 """
 import os, re, stat, time
 from bup import git
-from helpers import *
+from .helpers import *
 from bup.hashsplit import GIT_MODE_TREE, GIT_MODE_FILE
 
 EMPTY_SHA='\0'*20
@@ -41,7 +41,7 @@ class TooManySymlinks(NodeError):
 
 def _treeget(hash):
     it = cp().get(hash.encode('hex'))
-    type = it.next()
+    type = next(it)
     assert(type == 'tree')
     return git.tree_decode(''.join(it))
 
@@ -79,13 +79,13 @@ def _chunkiter(hash, startofs):
     tree = _tree_decode(hash)
 
     # skip elements before startofs
-    for i in xrange(len(tree)):
+    for i in range(len(tree)):
         if i+1 >= len(tree) or tree[i+1][0] > startofs:
             break
     first = i
 
     # iterate through what's left
-    for i in xrange(first, len(tree)):
+    for i in range(first, len(tree)):
         (ofs,isdir,sha) = tree[i]
         skipmore = startofs-ofs
         if skipmore < 0:
@@ -112,7 +112,7 @@ class _ChunkReader:
         while len(out) < size:
             if self.it and not self.blob:
                 try:
-                    self.blob = self.it.next()
+                    self.blob = next(self.it)
                 except StopIteration:
                     self.it = None
             if self.blob:
@@ -326,7 +326,7 @@ _symrefs = 0
 class Symlink(File):
     """A symbolic link from bup's repository."""
     def __init__(self, parent, name, hash, bupmode):
-        File.__init__(self, parent, name, 0120000, hash, bupmode)
+        File.__init__(self, parent, name, 0o120000, hash, bupmode)
 
     def size(self):
         """Get the file size of the file at which this link points."""
@@ -378,11 +378,11 @@ class Dir(Node):
     def _mksubs(self):
         self._subs = {}
         it = cp().get(self.hash.encode('hex'))
-        type = it.next()
+        type = next(it)
         if type == 'commit':
             del it
             it = cp().get(self.hash.encode('hex') + ':')
-            type = it.next()
+            type = next(it)
         assert(type == 'tree')
         for (mode,mangled_name,sha) in git.tree_decode(''.join(it)):
             name = mangled_name
@@ -441,7 +441,7 @@ class CommitList(Node):
 
     def _mksubs(self):
         self._subs = {}
-        for (name, (hash, date)) in self.commits.items():
+        for (name, (hash, date)) in list(self.commits.items()):
             n1 = Dir(self, name, GIT_MODE_TREE, hash)
             n1.ctime = n1.mtime = date
             self._subs[name] = n1

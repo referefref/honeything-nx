@@ -28,7 +28,7 @@ import abc
 import glob
 import os
 import tornado.ioloop
-import temperature
+from . import temperature
 import tr.core
 import tr.tr098_v1_4
 import tr.tr181_v2_2
@@ -46,7 +46,7 @@ PROC_STAT = '/proc/stat'
 SLASH_PROC = '/proc'
 
 
-class DeviceIdMeta(object):
+class DeviceIdMeta(object, metaclass=abc.ABCMeta):
   """Class to provide platform-specific fields for DeviceInfo.
 
   Each platform is expected to subclass DeviceIdMeta and supply concrete
@@ -56,7 +56,6 @@ class DeviceIdMeta(object):
   (because they will fail to startup when their DeviceId fails to
   instantiate.
   """
-  __metaclass__ = abc.ABCMeta
 
   @abc.abstractproperty
   def Manufacturer(self):
@@ -391,7 +390,7 @@ class DeviceInfo98Linux26(BASE98IGD.DeviceInfo):
 def main():
   dp = DeviceInfo181Linux26()
   #print tr.core.DumpSchema(dp)
-  print tr.core.Dump(dp)
+  print(tr.core.Dump(dp))
 
 if __name__ == '__main__':
   main()

@@ -20,9 +20,9 @@ __author__ = 'apenwarr@google.com (Avery Pennarun)'
 import unittest
 import weakref
 
-import google3
+from . import google3
 import tornado.ioloop
-import mainloop
+from . import mainloop
 
 
 REQUEST_STRING = 'this is the request\n'
@@ -33,14 +33,14 @@ idler = [0,0]
 
 @mainloop.WaitUntilIdle
 def IdleFunc():
-  print 'i0'
+  print('i0')
   idler[0] += 1
 
 
 class IdleClass(object):
   @mainloop.WaitUntilIdle
   def ClassIdleFunc(self):
-    print 'i1: %r' % self
+    print('i1: %r' % self)
     idler[1] += 1
 
 
@@ -48,7 +48,7 @@ class MainLoopTest(unittest.TestCase):
   """Tests for mainloop.MainLoop."""
 
   def _GotLine(self, line):
-    print 'got line: %r' % (line,)
+    print('got line: %r' % (line,))
     tornado.ioloop.IOLoop.instance().stop()
     self.assertEqual(line, REQUEST_STRING)
     self.got += line
@@ -66,12 +66,12 @@ class MainLoopTest(unittest.TestCase):
     listener = loop.ListenInet(('', 0), self._MakeHandler)
     stream = loop.Connect(listener.family, listener.address, self._SendRequest)
     loop.Start(timeout=5)
-    print 'after loop 1'
+    print('after loop 1')
     self.assertEqual(self.got, REQUEST_STRING)
     stream.close()
-    print 'after close'
+    print('after close')
     loop.RunOnce(timeout=5)
-    print 'after loop 2'
+    print('after loop 2')
 
     # This slightly weird test ensures that the LineReader object actually
     # gets destroyed after its client closes.  If it didn't, we would have
@@ -88,8 +88,8 @@ class MainLoopTest(unittest.TestCase):
     loop.RunOnce()
 
   def testIdler(self):
-    print
-    print 'testIdler'
+    print()
+    print('testIdler')
     loop = mainloop.MainLoop()
     loop.RunOnce()
     idler[0] = 0
@@ -97,9 +97,9 @@ class MainLoopTest(unittest.TestCase):
     IdleFunc()
     IdleFunc()
     loop.RunOnce()
-    self.assertEquals(idler, [1, 0])
+    self.assertEqual(idler, [1, 0])
     loop.RunOnce()
-    self.assertEquals(idler, [1, 0])
+    self.assertEqual(idler, [1, 0])
     i1 = IdleClass()
     i2 = IdleClass()
     i1.ClassIdleFunc()
@@ -107,7 +107,7 @@ class MainLoopTest(unittest.TestCase):
     i2.ClassIdleFunc()
     i2.ClassIdleFunc()
     loop.RunOnce()
-    self.assertEquals(idler, [1, 2])
+    self.assertEqual(idler, [1, 2])
 
 if __name__ == '__main__':
   unittest.main()

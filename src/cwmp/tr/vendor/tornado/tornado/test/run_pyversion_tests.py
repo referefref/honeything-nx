@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Runs the tornado test suite with all supported python interpreters."""
 
-from __future__ import absolute_import, division, with_statement
+
 
 import os
 import subprocess
@@ -25,16 +25,16 @@ def exists_on_path(filename):
 
 def main():
     for interpreter in INTERPRETERS:
-        print "=================== %s =======================" % interpreter
+        print("=================== %s =======================" % interpreter)
         if not exists_on_path(interpreter):
-            print "Interpreter not found, skipping..."
+            print("Interpreter not found, skipping...")
             continue
         args = [interpreter, "-m", "tornado.test.runtests"] + sys.argv[1:]
         ret = subprocess.call(args)
         if ret != 0:
-            print "Tests on %s failed with exit code %d" % (interpreter, ret)
+            print("Tests on %s failed with exit code %d" % (interpreter, ret))
             sys.exit(ret)
-    print "All tests passed"
+    print("All tests passed")
 
 if __name__ == "__main__":
     main()

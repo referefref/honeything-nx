@@ -35,7 +35,7 @@ def Unlink(filename):
   """
   try:
     os.unlink(filename)
-  except OSError, e:
+  except OSError as e:
     if e.errno != errno.ENOENT:
       raise
 

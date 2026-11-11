@@ -23,8 +23,8 @@ __author__ = 'dgentry@google.com (Denton Gentry)'
 import copy
 import unittest
 
-import google3
-import management_server
+from . import google3
+from . import management_server
 
 
 class MockConfig(object):
@@ -56,7 +56,7 @@ class MockCpeManagementServer(object):
     del self.copy
 
   def AbandonTransaction(self):
-    for k,v in self.copy.__dict__.iteritems():
+    for k,v in self.copy.__dict__.items():
       self.__dict__[k] = v
     del self.copy
 

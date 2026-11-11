@@ -22,8 +22,8 @@ __author__ = 'dgentry@google.com (Denton Gentry)'
 
 import unittest
 
-import google3
-import netdev
+from . import google3
+from . import netdev
 
 
 class NetdevTest(unittest.TestCase):

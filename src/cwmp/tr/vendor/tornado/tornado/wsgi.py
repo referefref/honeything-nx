@@ -29,14 +29,14 @@ provides WSGI support in two ways:
   and Tornado handlers in a single server.
 """
 
-from __future__ import absolute_import, division, with_statement
 
-import Cookie
-import httplib
+
+import http.cookies
+import http.client
 import logging
 import sys
 import tornado
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from tornado import escape
 from tornado import httputil
@@ -47,7 +47,7 @@ from tornado.util import b, monotime
 try:
     from io import BytesIO  # python 3
 except ImportError:
-    from cStringIO import StringIO as BytesIO  # python 2
+    from io import StringIO as BytesIO  # python 2
 
 
 class WSGIApplication(web.Application):
@@ -92,10 +92,10 @@ class WSGIApplication(web.Application):
         handler = web.Application.__call__(self, HTTPRequest(environ))
         assert handler._finished
         status = str(handler._status_code) + " " + \
-            httplib.responses[handler._status_code]
-        headers = handler._headers.items()
+            http.client.responses[handler._status_code]
+        headers = list(handler._headers.items())
         if hasattr(handler, "_new_cookie"):
-            for cookie in handler._new_cookie.values():
+            for cookie in list(handler._new_cookie.values()):
                 headers.append(("Set-Cookie", cookie.OutputString(None)))
         start_response(status,
                        [(native_str(k), native_str(v)) for (k, v) in headers])
@@ -107,15 +107,15 @@ class HTTPRequest(object):
     def __init__(self, environ):
         """Parses the given WSGI environ to construct the request."""
         self.method = environ["REQUEST_METHOD"]
-        self.path = urllib.quote(environ.get("SCRIPT_NAME", ""))
-        self.path += urllib.quote(environ.get("PATH_INFO", ""))
+        self.path = urllib.parse.quote(environ.get("SCRIPT_NAME", ""))
+        self.path += urllib.parse.quote(environ.get("PATH_INFO", ""))
         self.uri = self.path
         self.arguments = {}
         self.query = environ.get("QUERY_STRING", "")
         if self.query:
             self.uri += "?" + self.query
             arguments = parse_qs_bytes(native_str(self.query))
-            for name, values in arguments.iteritems():
+            for name, values in arguments.items():
                 values = [v for v in values if v]
                 if values:
                     self.arguments[name] = values
@@ -144,7 +144,7 @@ class HTTPRequest(object):
         self.files = {}
         content_type = self.headers.get("Content-Type", "")
         if content_type.startswith("application/x-www-form-urlencoded"):
-            for name, values in parse_qs_bytes(native_str(self.body)).iteritems():
+            for name, values in parse_qs_bytes(native_str(self.body)).items():
                 self.arguments.setdefault(name, []).extend(values)
         elif content_type.startswith("multipart/form-data"):
             if 'boundary=' in content_type:
@@ -166,7 +166,7 @@ class HTTPRequest(object):
     def cookies(self):
         """A dictionary of Cookie.Morsel objects."""
         if not hasattr(self, "_cookies"):
-            self._cookies = Cookie.SimpleCookie()
+            self._cookies = http.cookies.SimpleCookie()
             if "Cookie" in self.headers:
                 try:
                     self._cookies.load(
@@ -266,7 +266,7 @@ class WSGIContainer(object):
         environ = {
             "REQUEST_METHOD": request.method,
             "SCRIPT_NAME": "",
-            "PATH_INFO": urllib.unquote(request.path),
+            "PATH_INFO": urllib.parse.unquote(request.path),
             "QUERY_STRING": request.query,
             "REMOTE_ADDR": request.remote_ip,
             "SERVER_NAME": host,
@@ -284,7 +284,7 @@ class WSGIContainer(object):
             environ["CONTENT_TYPE"] = request.headers.pop("Content-Type")
         if "Content-Length" in request.headers:
             environ["CONTENT_LENGTH"] = request.headers.pop("Content-Length")
-        for key, value in request.headers.iteritems():
+        for key, value in request.headers.items():
             environ["HTTP_" + key.replace("-", "_").upper()] = value
         return environ
 

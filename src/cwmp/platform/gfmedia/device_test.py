@@ -25,10 +25,10 @@ import shutil
 import tempfile
 import unittest
 
-import google3
+from . import google3
 import tornado.ioloop
 import tornado.testing
-import device
+from . import device
 
 
 class MockIoloop(object):

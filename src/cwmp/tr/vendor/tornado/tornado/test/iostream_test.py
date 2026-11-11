@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, with_statement
+
 from tornado import netutil
 from tornado.ioloop import IOLoop
 from tornado.iostream import IOStream
@@ -238,7 +238,7 @@ class TestIOStream(AsyncHTTPTestCase, LogTrapTestCase):
         server, client = self.make_iostream_pair()
         try:
             NUM_KB = 4096
-            for i in xrange(NUM_KB):
+            for i in range(NUM_KB):
                 client.write(b("A") * 1024)
             client.write(b("\r\n"))
             server.read_until(b("\r\n"), self.stop)

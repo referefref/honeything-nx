@@ -21,7 +21,7 @@ and Google AppEngine.
 """
 
 import functools
-import ioloop
+from . import ioloop
 import logging
 import os
 import sys
@@ -52,7 +52,7 @@ def _reload_on_update(io_loop, modify_times):
     if _reload_attempted:
         # We already tried to reload and it didn't work, so don't try again.
         return
-    for module in sys.modules.values():
+    for module in list(sys.modules.values()):
         # Some modules play games with sys.modules (e.g. email/__init__.py
         # in the standard library), and occasionally this can cause strange
         # failures in getattr.  Just ignore anything that's not an ordinary
@@ -72,7 +72,7 @@ def _reload_on_update(io_loop, modify_times):
         if modify_times[path] != modified:
             logging.info("%s modified; restarting server", path)
             _reload_attempted = True
-            for fd in io_loop._handlers.keys():
+            for fd in list(io_loop._handlers.keys()):
                 try:
                     os.close(fd)
                 except:

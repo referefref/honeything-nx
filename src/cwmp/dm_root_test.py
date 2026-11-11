@@ -21,10 +21,10 @@
 __author__ = 'dgentry@google.com (Denton Gentry)'
 
 import unittest
-import google3
-import dm_root
-import tr.tr098_v1_4
-import tr.tr181_v2_2
+from . import google3
+from . import dm_root
+from . import tr.tr098_v1_4
+from . import tr.tr181_v2_2
 
 
 BASE181 = tr.tr181_v2_2.Device_v2_2.Device

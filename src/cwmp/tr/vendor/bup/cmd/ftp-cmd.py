@@ -14,7 +14,7 @@ class OptionError(Exception):
 def do_ls(cmd_args):
     try:
         ls.do_ls(cmd_args, pwd, onabort=OptionError)
-    except OptionError, e:
+    except OptionError as e:
         return
 
 
@@ -27,9 +27,9 @@ def inputiter():
     if os.isatty(sys.stdin.fileno()):
         while 1:
             try:
-                yield raw_input('bup> ')
+                yield input('bup> ')
             except EOFError:
-                print ''  # Clear the line for the terminal's next prompt
+                print('')  # Clear the line for the terminal's next prompt
                 break
     else:
         for line in sys.stdin:
@@ -42,9 +42,8 @@ def _completer_get_subs(line):
     #log('\ncompleter: %r %r %r\n' % (qtype, lastword, text))
     try:
         n = pwd.resolve(dir)
-        subs = list(filter(lambda x: x.name.startswith(name),
-                           n.subs()))
-    except vfs.NoSuchFile, e:
+        subs = list([x for x in n.subs() if x.name.startswith(name)])
+    except vfs.NoSuchFile as e:
         subs = []
     return (dir, name, qtype, lastword, subs)
 
@@ -110,12 +109,12 @@ def completer(text, state):
                 ret = shquote.what_to_add(qtype, lastword, fullname,
                                           terminate=True) + ' '
             return text + ret
-    except Exception, e:
+    except Exception as e:
         log('\n')
         try:
             import traceback
-            traceback.print_tb(sys.exc_traceback)
-        except Exception, e2:
+            traceback.print_tb(sys.exc_info()[2])
+        except Exception as e2:
             log('Error printing traceback: %s\n' % e2)
         log('\nError in completion: %s\n' % e)
 
@@ -165,7 +164,7 @@ for line in lines:
                     raise vfs.NotDir('%s is not a directory' % parm)
             pwd = np
         elif cmd == 'pwd':
-            print pwd.fullname()
+            print(pwd.fullname())
         elif cmd == 'cat':
             for parm in words[1:]:
                 write_to_file(pwd.resolve(parm).open(), sys.stdout)
@@ -190,7 +189,7 @@ for line in lines:
                             outf = open(n.name, 'wb')
                             write_to_file(inf, outf)
                             outf.close()
-                        except Exception, e:
+                        except Exception as e:
                             rv = 1
                             log('  error: %s\n' % e)
         elif cmd == 'help' or cmd == '?':
@@ -200,7 +199,7 @@ for line in lines:
         else:
             rv = 1
             raise Exception('no such command %r' % cmd)
-    except Exception, e:
+    except Exception as e:
         rv = 1
         log('error: %s\n' % e)
         #raise

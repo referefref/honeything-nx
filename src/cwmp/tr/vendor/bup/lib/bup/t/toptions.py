@@ -15,7 +15,7 @@ def test_optdict():
     WVPASSEQ(d.no_z, False)
     WVPASSEQ(d.no_other_thing, True)
     try:
-        print d.p
+        print(d.p)
     except:
         WVPASS("invalid args don't match")
     else:

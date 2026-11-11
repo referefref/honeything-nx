@@ -22,7 +22,7 @@ __author__ = 'dgentry@google.com (Denton Gentry)'
 
 import json
 import sys
-import google3
+from . import google3
 import tr.core
 import tr.x_catawampus_1_0
 

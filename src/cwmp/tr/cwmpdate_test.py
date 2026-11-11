@@ -24,8 +24,8 @@ import calendar
 import datetime
 import unittest
 
-import google3
-import cwmpdate
+from . import google3
+from . import cwmpdate
 
 
 class UTC(datetime.tzinfo):

@@ -25,8 +25,8 @@ import bz2
 import tempfile
 import unittest
 
-import google3
-import gmoca
+from . import google3
+from . import gmoca
 
 
 class GMoCATest(unittest.TestCase):

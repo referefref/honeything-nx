@@ -6,11 +6,11 @@ from wvtest import *
 
 @wvtest
 def testmangle():
-    afile  = 0100644
-    afile2 = 0100770
-    alink  = 0120000
-    adir   = 0040000
-    adir2  = 0040777
+    afile  = 0o100644
+    afile2 = 0o100770
+    alink  = 0o120000
+    adir   = 0o040000
+    adir2  = 0o040777
     WVPASSEQ(git.mangle_name("a", adir2, adir), "a")
     WVPASSEQ(git.mangle_name(".bup", adir2, adir), ".bup.bupl")
     WVPASSEQ(git.mangle_name("a.bupa", adir2, adir), "a.bupa.bupl")
@@ -66,12 +66,12 @@ def testpacks():
         hashes.append(w.new_blob(str(i)))
     log('\n')
     nameprefix = w.close()
-    print repr(nameprefix)
+    print(repr(nameprefix))
     WVPASS(os.path.exists(nameprefix + '.pack'))
     WVPASS(os.path.exists(nameprefix + '.idx'))
 
     r = git.open_idx(nameprefix + '.idx')
-    print repr(r.fanout)
+    print(repr(r.fanout))
 
     for i in range(nobj):
         WVPASS(r.find_offset(hashes[i]) > 0)
@@ -80,7 +80,7 @@ def testpacks():
 
     pi = iter(r)
     for h in sorted(hashes):
-        WVPASSEQ(str(pi.next()).encode('hex'), h.encode('hex'))
+        WVPASSEQ(str(next(pi)).encode('hex'), h.encode('hex'))
 
     WVFAIL(r.find_offset('\0'*20))
 
@@ -127,7 +127,7 @@ def test_long_index():
             0x22334455, 0x66778899, 0x00112233, 0x44556677, 0x88990011)
     pack_bin = struct.pack('!IIIII',
             0x99887766, 0x55443322, 0x11009988, 0x77665544, 0x33221100)
-    idx = list(list() for i in xrange(256))
+    idx = list(list() for i in range(256))
     idx[0].append((obj_bin, 1, 0xfffffffff))
     idx[0x11].append((obj2_bin, 2, 0xffffffffff))
     idx[0x22].append((obj3_bin, 3, 0xff))
@@ -151,7 +151,7 @@ def test_check_repo_or_die():
     open('pybuptest.tmp/objects/pack', 'w').close()
     try:
         git.check_repo_or_die()
-    except SystemExit, e:
+    except SystemExit as e:
         WVPASSEQ(e.code, 14)
     else:
         WVFAIL()
@@ -160,7 +160,7 @@ def test_check_repo_or_die():
 
     try:
         git.check_repo_or_die('nonexistantbup.tmp')
-    except SystemExit, e:
+    except SystemExit as e:
         WVPASSEQ(e.code, 15)
     else:
         WVFAIL()

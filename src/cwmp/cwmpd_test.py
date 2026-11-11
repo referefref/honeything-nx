@@ -25,8 +25,8 @@ import os
 import select
 import subprocess
 import unittest
-import google3
-import tr.helpers
+from . import google3
+from . import tr.helpers
 
 
 class RunserverTest(unittest.TestCase):
@@ -41,8 +41,8 @@ class RunserverTest(unittest.TestCase):
     return client
 
   def _DoTest(self, args):
-    print
-    print 'Testing with args=%r' % args
+    print()
+    print('Testing with args=%r' % args)
     tr.helpers.Unlink(self.sockname)
     server = subprocess.Popen(['./cwmpd',
                                '--rcmd-port', '0',
@@ -50,7 +50,7 @@ class RunserverTest(unittest.TestCase):
                                '--close-stdio'] + args,
                               stdout=subprocess.PIPE, stdin=subprocess.PIPE)
     try:
-      print 'waiting for server to start...'
+      print('waiting for server to start...')
       while server.stdout.read():
         pass
       client = self._StartClient()
@@ -65,7 +65,7 @@ class RunserverTest(unittest.TestCase):
       tr.helpers.Unlink(self.sockname)
 
   def testExitOnError(self):
-    print 'testing client exit when server not running'
+    print('testing client exit when server not running')
     client = self._StartClient(stdout=subprocess.PIPE)
     r, _, _ = select.select([client.stdout], [], [], 5)
     try:

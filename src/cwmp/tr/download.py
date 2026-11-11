@@ -23,16 +23,16 @@ import errno
 import os
 import shutil
 import time
-import urlparse
-import google3
+import urllib.parse
+from . import google3
 import tornado
 import tornado.httpclient
 import tornado.ioloop
 import tornado.web
-import core
-import helpers
-import http_download
-import persistobj
+from . import core
+from . import helpers
+from . import http_download
+from . import persistobj
 
 import shutil
 from src.logger.HoneythingLogging import HTLogging
@@ -200,7 +200,7 @@ class Download(object):
     url = getattr(stateobj, 'url', '')
     username = getattr(stateobj, 'username', None)
     password = getattr(stateobj, 'password', None)
-    o = urlparse.urlparse(url)
+    o = urllib.parse.urlparse(url)
     client = DOWNLOAD_CLIENT[o.scheme]
     return client(url=url, username=username, password=password,
                   download_complete_cb=self.download_complete_callback,
@@ -402,7 +402,7 @@ class DownloadManager(object):
       faultstring = 'Max downloads (%d) reached.' % self.MAXDOWNLOADS
       raise core.ResourcesExceededError(faultstring)
 
-    o = urlparse.urlparse(url)
+    o = urllib.parse.urlparse(url)
     if o.scheme not in DOWNLOAD_CLIENT:
       raise core.FileTransferProtocolError(
           'Unsupported URL scheme %s' % o.scheme)
@@ -516,7 +516,7 @@ class DownloadManager(object):
   def _MakeDirsIgnoreError(self, directory):
     """Make sure a directory exists."""
     try:
-      os.makedirs(directory, 0755)
+      os.makedirs(directory, 0o755)
     except OSError:
       pass
 

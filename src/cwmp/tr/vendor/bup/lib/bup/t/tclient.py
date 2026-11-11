@@ -4,7 +4,7 @@ from wvtest import *
 
 def randbytes(sz):
     s = ''
-    for i in xrange(sz):
+    for i in range(sz):
         s += chr(random.randrange(0,256))
     return s
 

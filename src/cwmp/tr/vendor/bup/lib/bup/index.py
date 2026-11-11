@@ -89,7 +89,7 @@ class Entry:
                            self.uid, self.gid, self.size, self.mode,
                            self.gitmode, self.sha, self.flags,
                            self.children_ofs, self.children_n)
-        except (DeprecationWarning, struct.error), e:
+        except (DeprecationWarning, struct.error) as e:
             log('pack error: %s (%r)\n' % (e, self))
             raise
 
@@ -236,7 +236,7 @@ class ExistingEntry(Entry):
         ofs = self.children_ofs
         assert(ofs <= len(self._m))
         assert(self.children_n < 1000000)
-        for i in xrange(self.children_n):
+        for i in range(self.children_n):
             eon = self._m.find('\0', ofs)
             assert(eon >= 0)
             assert(eon >= ofs)
@@ -267,7 +267,7 @@ class Reader:
         f = None
         try:
             f = open(filename, 'r+')
-        except IOError, e:
+        except IOError as e:
             if e.errno == errno.ENOENT:
                 pass
             else:
@@ -448,7 +448,7 @@ def reduce_paths(paths):
                 rp = slashappend(rp)
                 p = slashappend(p)
             xpaths.append((rp, p))
-        except OSError, e:
+        except OSError as e:
             add_error('reduce_paths: %s' % e)
     xpaths.sort()
 

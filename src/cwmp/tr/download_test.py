@@ -26,10 +26,10 @@ import tempfile
 import time
 import unittest
 
-import google3
-import core
-import download
-import persistobj
+from . import google3
+from . import core
+from . import download
+from . import persistobj
 
 
 mock_http_clients = []
@@ -549,7 +549,7 @@ class DownloadManagerTest(unittest.TestCase):
     expected = set()
     numrb = 3
     for i in range(numrb):
-      key = u'TestCommandKey' + str(i)
+      key = 'TestCommandKey' + str(i)
       args = {'command_key': key}
       persistobj.PersistentObject(objdir=dm.config_dir,
                                   rootname=download.BOOTROOTNAME,

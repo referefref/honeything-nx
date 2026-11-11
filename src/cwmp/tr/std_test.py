@@ -21,8 +21,8 @@
 __author__ = 'apenwarr@google.com (Avery Pennarun)'
 
 import unittest
-import core
-import tr098_v1_2 as tr098
+from . import core
+from . import tr098_v1_2 as tr098
 
 
 class MyModel(tr098.InternetGatewayDevice_v1_4):
@@ -51,7 +51,7 @@ class StdTest(unittest.TestCase):
   def testStd(self):
     o = MyModel()
     o.ValidateExports()
-    print core.Dump(o)
+    print(core.Dump(o))
 
 
 if __name__ == '__main__':

@@ -29,7 +29,7 @@ import tr.core
 import tr.cwmpdate
 import tr.tr181_v2_4
 import tr.x_catawampus_tr181_2_0
-import netdev
+from . import netdev
 
 BASEETHERNET = tr.tr181_v2_4.Device_v2_4.Device.Ethernet
 CATAWAMPUSETHERNET = tr.x_catawampus_tr181_2_0.X_CATAWAMPUS_ORG_Device_v2_0.Device.Ethernet
